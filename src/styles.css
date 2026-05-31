@@ -1,0 +1,172 @@
+/*вся css логика*/
+
+/*MAIN*/
+.header {
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  background-color: #eeeeee;
+  height:40px;
+}
+
+.h-menu {
+  justify-content: flex-start;
+  display: flex;
+}
+.h-left-menu {
+  justify-content: flex-end;
+  display: flex;
+  gap: 20px;
+}
+
+a {text-decoration: none;}
+
+button {
+  background: none;      
+  border: none;         
+  padding: 1;            
+  cursor: pointer;      
+  outline: none;        
+}
+button:focus,
+button:active {
+  outline: none;
+}
+
+.button-RegOrLogin{
+  gap:10px;
+  display: flex;
+}
+
+.button-RegOrLogin{
+  text-decoration: none;
+  color: #333;
+  font-family: cursive;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 8px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+.button-RegOrLogin:hover {
+  background-color: #ffffff;
+  color: black;
+}
+
+#h-profile-search {
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+#h-profile-search:hover {
+  background-color: #ffffff;
+}
+
+#h-profile-push {
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+#h-profile-push:hover {
+  background-color: #ffffff;
+}
+
+.h-buttons a {
+  text-decoration: none;
+  color: #333;
+  font-family: cursive;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 8px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.h-buttons a:hover {
+  background-color: #ffffff;
+  color: black;
+}
+
+.h-logo {
+  height: 40px; 
+  width: auto;   
+  object-fit: contain;
+  border-radius: 10px;  
+}
+
+.h-profile {
+  height: 40px; 
+  width: auto;   
+  object-fit: contain;
+}
+
+.h-profile-name {
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;  /* шрифт */
+  color: #333;  
+
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 36;
+  
+  background-color: white;
+  border-radius: 10px; 
+}
+
+
+.h-buttons{
+  display: flex;
+}
+
+
+.h-title{
+  font-family: 'Bahnschrift SemiCondensed';
+  font-size: 36px;
+}
+/*Login and Register form*/
+.Entry {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 39px 25px;
+  font-family: cursive;
+  gap: 20px;
+}
+/*TRENDS*/
+.trends{
+  display: flex;
+  padding: 39px 0px;
+}
+/*PROJ TRENDS*/
+.trends-projects{
+  display: flex;
+  padding: 0px 0px;
+  gap:50px;
+  background-color: #eeeeee;
+}
+.tp-card{
+  width:200px;
+}
+.tp-img img{
+  width:100%;
+}
+.tp-img{
+  position: relative;
+}
+.tp-type{
+  display: flex;
+  position: absolute;
+  top:10px;
+  justify-content: center;
+  background-color: #eeeeee;
+}
+
+/*PROJECTS*/
+.projects{
+  display: flex;
+  padding: 20px 5px;
+}

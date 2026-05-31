@@ -1,0 +1,10 @@
+dist/
+node_modules/
+
+*.env
+
+*.kra
+*.kra~
+*.png~
+*.jpg~
+*.bmp~
