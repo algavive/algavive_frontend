@@ -2,7 +2,7 @@ import * as config from '../config'
 import { Link } from 'react-router-dom'
 
 const test = {
-  logined: true,
+  logined: false,
   name: "John Doe"
 }
 
