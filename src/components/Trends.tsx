@@ -66,7 +66,7 @@ const Trends = () => {
           </button>
         </div>
       </div>
-      <div className="trends-projects">
+      <div className="project-projects">
         {projects.map(project => (
           <ProjectCard key={project.id} project={project} />
         ))}

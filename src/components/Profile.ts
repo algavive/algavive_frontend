@@ -1,5 +1,5 @@
 //Потом вставлю api kjubre
-interface User{
+interface User {
 	logined: boolean
 	name: string
 	admin: boolean
@@ -7,8 +7,8 @@ interface User{
 }
 
 export const user: User = {
-  logined: false,
+  logined: true,
   name: "John Doe",
-  admin: false,
+  admin: true,
   avatarUrl: null
 }

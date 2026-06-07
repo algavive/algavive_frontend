@@ -9,6 +9,7 @@ import Register from './urls/Register'
 import ResetPass from './urls/ResetPass'
 
 import Entertainment from './urls/Entertainment'
+import MyProjects from './urls/MyProjects'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/entertainment" element={<Entertainment />} />
         <Route path="/resetpass" element={<ResetPass />} />
+        <Route path="/my-projects" element={<MyProjects />} />
       </Routes>
     </div>
   )

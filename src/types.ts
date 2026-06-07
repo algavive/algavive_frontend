@@ -5,7 +5,7 @@ export interface Project {
   title: string
   author: string
   type: string
-  imageUrl: string || null
+  imageUrl: string | null
   likes: number
   comments: number
 }

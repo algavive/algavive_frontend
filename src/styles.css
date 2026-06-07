@@ -140,10 +140,10 @@ button:active {
 .trends{
   display: flex;
   font-family: cursive;
-  padding: 39px 0px;
+  padding: 25px 0px;
 }
 /*PROJ TRENDS*/
-.trends-projects{
+.project-projects{
   font-family: cursive;
   display: flex;
   padding: 0px 0px;
@@ -171,6 +171,48 @@ button:active {
   top:10px;
   justify-content: center;
   background-color: #eeeeee;
+}
+
+.t-buttons, .p-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.createProject {
+  display: flex;
+  padding: 20px 15px;
+}
+
+.createProject button {
+  border-radius: 10px;
+  background-color: #e0e0e0;
+  font-family: cursive;
+  font-size: 14px;
+  width:125px*2;
+  height:25px*2;
+  transition: all 0.3s ease;
+}
+.createProject button:hover {
+  background-color: #efefef;
+}
+
+.t-buttons button, .p-buttons button {
+  border-radius: 10px;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  font-family: cursive;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.t-buttons button.active, .p-buttons button.active {
+  background-color: #9b59b6;
+  color: white;
 }
 
 /*PROJECTS*/
@@ -331,7 +373,7 @@ button:active {
 }
 
 .notif-target {
-  color: #4CAF50;
+  color: darkmagenta;
   font-weight: 500;
 }
 

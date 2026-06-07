@@ -3,7 +3,7 @@ import ProjectCard from '../components/ProjectCard'
 import type { Project } from '../types'
 import * as config from '../config'
 
-const Projects = () => {
+export default function MyProjects() {
   const [activeFilter, setActiveFilter] = useState<'new' | 'popular' | 'discussed'>('new')
   
 
@@ -32,34 +32,22 @@ useEffect(() => {
 
   const projects: Project[] = [
     {
-      id: 7,
-      title: 'Эмулятор нес',
-      author: 'turip ip turip',
-      type: 'Веб',
+      id: 1234,
+      title: 'абвгдейка',
+      author: 'абвгдеевич',
+      type: 'Пост',
       imageUrl: null,
       likes: 15,
       comments: 4
-    },
-    {
-      id: 8,
-      title: '3д движок(который скомпилирован с турбоварп)',
-      author: 'StarDev',
-      type: 'Html',
-      imageUrl: null,
-      likes: 120,
-      comments: 45
     }
+
   ]
 
   const handleFilterChange = (filter: 'new' | 'popular' | 'discussed') => {
     setActiveFilter(filter)
   }
-
-  return (
-    <>
-      <div className="projects">
-        <div className="p-title">Проекты:</div>
-        <div className="p-buttons">
+/*
+     	
           <button 
             className={activeFilter === 'new' ? 'active' : ''}
             onClick={() => handleFilterChange('new')}
@@ -78,7 +66,19 @@ useEffect(() => {
           >
             Обсуждаемые
           </button>
+
+
+
+*/
+  return (
+    <>
+      <div className="projects">
+        <div className="p-title">Мои проекты:</div>
+        <div className="p-buttons">
         </div>
+      </div>
+      <div className="createProject">
+        <button>+ Создать проект</button>
       </div>
       <div className="project-projects">
         {projects.map(project => (
@@ -87,6 +87,5 @@ useEffect(() => {
       </div>
     </>
   )
-}
 
-export default Projects
+}
