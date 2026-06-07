@@ -6,6 +6,30 @@ import * as config from '../config'
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState<'new' | 'popular' | 'discussed'>('new')
   
+
+  /*
+useEffect(() => {
+    const fetchProjects = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`${config.BACKEND_URL}/api/projects?sort=${activeFilter}`)
+        const data = await response.json()
+        setProjects(data) 
+      } catch (error) {
+        console.error('Ошибка загрузки проектов', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [activeFilter]) 
+
+
+  */
+
+
+
   const projects: Project[] = [
     {
       id: 7,
@@ -27,9 +51,9 @@ const Projects = () => {
     }
   ]
 
-  /*const handleFilterChange = (filter: 'new' | 'popular' | 'discussed') => {
+  const handleFilterChange = (filter: 'new' | 'popular' | 'discussed') => {
     setActiveFilter(filter)
-  }*/
+  }
 
   return (
     <>

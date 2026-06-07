@@ -1,7 +1,7 @@
 import { useState, useRef, FormEvent } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
-import * as config from '../config.ts';
+import * as config from '../config';
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,8 +23,10 @@ export default function Register() {
       setIsLoading(false);
       return;
     }
-
+    alert(token)
+    /*
     try {
+      
       const response = await fetch(`${config.BACKEND_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,12 +39,11 @@ export default function Register() {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setSuccess('Регистрация успешна! Перенаправление...');
         setTimeout(() => {
           window.location.href = '/';
-        }, 2000);
+        }, 2000)
       } else {
         setError(data.error || 'Ошибка регистрации');
         turnstileRef.current?.reset();
@@ -52,7 +53,8 @@ export default function Register() {
       turnstileRef.current?.reset();
     } finally {
       setIsLoading(false);
-    }
+    }*/
+    setIsLoading(false);
   };
 
   return (

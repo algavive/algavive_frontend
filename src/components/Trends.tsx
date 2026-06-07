@@ -5,9 +5,8 @@ import * as config from '../config'
 
 const Trends = () => {
   const [activeTrend, setActiveTrend] = useState<'day' | 'week' | 'month'>('day')
-  
-  // Пример данных (позже можно заменить на API)
 
+//Там api просто допишу
   const projects: Project[] = [
     {
       id: 1,
@@ -40,7 +39,6 @@ const Trends = () => {
 
   const handleTrendChange = (trend: 'day' | 'week' | 'month') => {
     setActiveTrend(trend)
-    // Здесь потом добавишь логику загрузки проектов для разных трендов
   }
 
   return (

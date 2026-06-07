@@ -2,7 +2,7 @@ import * as config from '../config'
 import { Link } from 'react-router-dom'
 
 const test = {
-  logined: false,
+  logined: true,
   name: "John Doe"
 }
 
@@ -12,7 +12,7 @@ export function ProfileHeader() {
 			<Link to="/my-profile">
 			<div className="h-profile-name">
           		{test.name}
-          		<img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="h-profile"/>
+          		<img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="h-profile" style={{borderRadius: '36px'}} />
       		</div>
       	</Link>
 			)

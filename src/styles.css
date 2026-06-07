@@ -139,10 +139,12 @@ button:active {
 /*TRENDS*/
 .trends{
   display: flex;
+  font-family: cursive;
   padding: 39px 0px;
 }
 /*PROJ TRENDS*/
 .trends-projects{
+  font-family: cursive;
   display: flex;
   padding: 0px 0px;
   gap:50px;
@@ -151,11 +153,16 @@ button:active {
 .tp-card{
   width:200px;
 }
+.tp-card a{
+    color: #333;
+}
 .tp-img img{
   width:100%;
+  border-radius: 10px; 
 }
 .tp-img{
   position: relative;
+
 }
 .tp-type{
   display: flex;
@@ -169,4 +176,170 @@ button:active {
 .projects{
   display: flex;
   padding: 20px 5px;
+  font-family: cursive;
+}
+
+/*ДЛЯ *Button.
+/* Контейнеры для кнопок с меню */
+.search-button-wrapper,
+.notification-button-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Меню поиска и уведомлений */
+.search-menu,
+.notification-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  border: 1px solid #e0e0e0;
+
+}
+
+.search-header,
+.notif-header {
+  padding: 12px 16px;
+  background: #f5f5f5;
+  font-weight: bold;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+
+.search-input-group {
+  display: flex;
+  padding: 12px;
+  gap: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.search-input-group input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-input-group button {
+  padding: 8px 16px;
+  background: purple;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.search-type {
+  display: flex;
+  padding: 10px 12px;
+  gap: 20px;
+  background: #fafafa;
+}
+
+.search-type label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #666;
+}
+
+.search-type label.active {
+  color: purple;
+}
+
+.search-button-wrapper{
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  font-family: cursive;
+}
+
+.search-button-wrapper:hover {
+  background-color: #ffffff;
+}
+/**/
+.notification-button-wrapper{
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  font-family: cursive;
+}
+
+.notification-button-wrapper:hover {
+  background-color: #ffffff;
+}
+
+/* Уведомления */
+.notif-count {
+  background: #ff4444;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.notif-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  padding: 12px 16px;
+  gap: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.notif-item:hover {
+  background: #f0f0f0;
+}
+
+.notif-icon {
+  width: 32px;
+  height: 32px;
+  background: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.notif-content {
+  flex: 1;
+}
+
+.notif-text {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.notif-target {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.notif-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.notif-empty {
+  padding: 30px;
+  text-align: center;
+  color: #999;
 }

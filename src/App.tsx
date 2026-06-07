@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import Header from './urls/Header'
+import Header from './Header'
 import Home from './urls/Home'
 import HallOfFame from './urls/HallOfFame'
 import Entry from './urls/Entry'
@@ -7,8 +7,9 @@ import Entry from './urls/Entry'
 import Login from './urls/Login'
 import Register from './urls/Register'
 
+import Entertainment from './urls/Entertainment'
 
-function App() {
+export default function App() {
   return (
     <div>
       <Header />
@@ -18,9 +19,8 @@ function App() {
         <Route path="/entry" element={<Entry />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/entertainment" element={<Entertainment />} >
       </Routes>
     </div>
   )
 }
-
-export default App
