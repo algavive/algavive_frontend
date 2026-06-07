@@ -68,7 +68,7 @@ export default function Register() {
         <h3>Введите пароль:</h3>
         <input type="password" name="pass" required disabled={isLoading} />
         
-        <h3>Введите email (экспериментально):</h3>
+        <h3>Введите email (экспериментально 2FA):</h3>
         <input type="email" name="email" disabled={isLoading} />
         
         <Turnstile

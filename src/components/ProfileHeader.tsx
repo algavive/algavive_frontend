@@ -1,18 +1,14 @@
 import * as config from '../config'
 import { Link } from 'react-router-dom'
-
-const test = {
-  logined: true,
-  name: "John Doe"
-}
+import { user } from './Profile'
 
 export function ProfileHeader() {
-	if (test.logined) {
+	if (user.logined) {
 		return (
 			<Link to="/my-profile">
 			<div className="h-profile-name">
-          		{test.name}
-          		<img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="h-profile" style={{borderRadius: '36px'}} />
+          		{user.name}
+          		<img src={user.avatarUrl ? user.avatarUrl : `${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="h-profile" style={{borderRadius: '36px'}} />
       		</div>
       	</Link>
 			)

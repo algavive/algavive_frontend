@@ -36,7 +36,7 @@ useEffect(() => {
       title: 'Эмулятор нес',
       author: 'turip ip turip',
       type: 'Веб',
-      imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+      imageUrl: null,
       likes: 15,
       comments: 4
     },
@@ -45,7 +45,7 @@ useEffect(() => {
       title: '3д движок(который скомпилирован с турбоварп)',
       author: 'StarDev',
       type: 'Html',
-      imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+      imageUrl: null,
       likes: 120,
       comments: 45
     }

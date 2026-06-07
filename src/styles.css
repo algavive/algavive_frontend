@@ -149,6 +149,7 @@ button:active {
   padding: 0px 0px;
   gap:50px;
   background-color: #eeeeee;
+  flex-wrap: wrap;
 }
 .tp-card{
   width:200px;
@@ -177,6 +178,7 @@ button:active {
   display: flex;
   padding: 20px 5px;
   font-family: cursive;
+  flex-wrap: wrap;
 }
 
 /*ДЛЯ *Button.

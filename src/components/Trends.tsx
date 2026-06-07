@@ -13,7 +13,7 @@ const Trends = () => {
       title: 'крутой шутан',
       author: 'Something',
       type: 'Скретч',
-      imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+      imageUrl: null,
       likes: 25,
       comments: 5
     },
@@ -22,7 +22,7 @@ const Trends = () => {
       title: 'Мэднес комбат',
       author: 'GamerDev12672',
       type: 'Пост',
-      imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+      imageUrl: null,
       likes: 37,
       comments: 8
     },
@@ -31,7 +31,7 @@ const Trends = () => {
       title: 'Когда я выучу реакт и хоноо',
       author: 'CoderPro',
       type: 'Видео',
-      imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+      imageUrl: null,
       likes: 52,
       comments: 15
     }

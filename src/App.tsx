@@ -6,6 +6,7 @@ import Entry from './urls/Entry'
 
 import Login from './urls/Login'
 import Register from './urls/Register'
+import ResetPass from './urls/ResetPass'
 
 import Entertainment from './urls/Entertainment'
 
@@ -19,7 +20,8 @@ export default function App() {
         <Route path="/entry" element={<Entry />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/entertainment" element={<Entertainment />} >
+        <Route path="/entertainment" element={<Entertainment />} />
+        <Route path="/resetpass" element={<ResetPass />} />
       </Routes>
     </div>
   )

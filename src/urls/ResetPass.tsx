@@ -2,9 +2,8 @@ import { useState, useRef, FormEvent } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import * as config from '../config.ts';
-import { Link } from 'react-router-dom'
 
-export default function Login(){
+export default function ResetPass(){
 	const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -13,12 +12,10 @@ export default function Login(){
 	}
 		return (
 		<div className="Entry">
+			<h1>Восстановления пароля(экспериментально)</h1>
 			<form onSubmit={handleSubmit}>
-			<h1>Вход в аккаунт</h1>
-			<h3>Введите логин:</h3>
-			<input type="text" name="login" />
-			<h3>Введите пароль:</h3>
-			<input type="password" name="pass" />
+			<h2>Введите email (экспериментально 2FA):</h2>
+        	<input type="email" name="email" disabled={isLoading} />
 			<Turnstile
           ref={turnstileRef}
           siteKey={config.SITEKEY_TURNSTILE}
@@ -26,11 +23,16 @@ export default function Login(){
         />
         {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         {success && <div style={{ color: 'green', marginTop: '10px' }}>{success}</div>}
-			<input type="submit" value="Войти" />
-			<h1>Восстановление пароля</h1>
-			<h3>Работает с аккаунтами, у кого эмейл и это пока экспериментально</h3>
-			<Link to="/resetpass">Забыли пароль?</Link>
-
+        	<input type="submit" value="Отправить" />
+		</form>
+		<form>
+			<h2>Введите код полученный с email и новый пароль:</h2>
+			<h3>Код:</h3>
+        	<input type="password" name="code" disabled={isLoading} />
+        	<h3>Пароль:</h3>
+        	<input type="password" name="changepass" disabled={isLoading} />
+        	<h1/>
+        	<input type="submit" value="Отправить" />
 		</form>
 		</div>
 		)
