@@ -11,6 +11,8 @@ import ResetPass from './urls/ResetPass'
 import Entertainment from './urls/Entertainment'
 import MyProjects from './urls/MyProjects'
 
+import Project from './urls/Project'
+
 export default function App() {
   return (
     <div>
@@ -24,6 +26,7 @@ export default function App() {
         <Route path="/entertainment" element={<Entertainment />} />
         <Route path="/resetpass" element={<ResetPass />} />
         <Route path="/my-projects" element={<MyProjects />} />
+        <Route path="/project" element={<Project />} />
       </Routes>
     </div>
   )

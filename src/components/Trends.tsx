@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import ProjectCard from '../components/ProjectCard'
 import type { Project } from '../types'
 import * as config from '../config'
 
 const Trends = () => {
   const [activeTrend, setActiveTrend] = useState<'day' | 'week' | 'month'>('day')
-
+  const scrollRef = useRef<HTMLDivElement>(null)
 //Там api просто допишу
   const projects: Project[] = [
     {
@@ -15,7 +15,8 @@ const Trends = () => {
       type: 'Скретч',
       imageUrl: null,
       likes: 25,
-      comments: 5
+      comments: 5,
+      views: 20
     },
     {
       id: 3,
@@ -24,7 +25,8 @@ const Trends = () => {
       type: 'Пост',
       imageUrl: null,
       likes: 37,
-      comments: 8
+      comments: 8,
+      views: 20
     },
     {
       id: 4,
@@ -33,12 +35,112 @@ const Trends = () => {
       type: 'Видео',
       imageUrl: null,
       likes: 52,
-      comments: 15
-    }
+      comments: 15,
+      views: 20
+    },{
+      id: 1,
+      title: 'крутой шутан',
+      author: 'Something',
+      type: 'Скретч',
+      imageUrl: null,
+      likes: 25,
+      comments: 5,
+      views: 20
+    },
+    {
+      id: 3,
+      title: 'Мэднес комбат',
+      author: 'GamerDev12672',
+      type: 'Пост',
+      imageUrl: null,
+      likes: 37,
+      comments: 8,
+      views: 20
+    },
+    {
+      id: 4,
+      title: 'Когда я выучу реакт и хоноо',
+      author: 'CoderPro',
+      type: 'Видео',
+      imageUrl: null,
+      likes: 52,
+      comments: 15,
+      views: 20
+    },{
+      id: 1,
+      title: 'крутой шутан',
+      author: 'Something',
+      type: 'Скретч',
+      imageUrl: null,
+      likes: 25,
+      comments: 5,
+      views: 20
+    },
+    {
+      id: 3,
+      title: 'Мэднес комбат',
+      author: 'GamerDev12672',
+      type: 'Пост',
+      imageUrl: null,
+      likes: 37,
+      comments: 8,
+      views: 20
+    },
+    {
+      id: 4,
+      title: 'Когда я выучу реакт и хоноо',
+      author: 'CoderPro',
+      type: 'Видео',
+      imageUrl: null,
+      likes: 52,
+      comments: 15,
+      views: 20
+    },{
+      id: 1,
+      title: 'крутой шутан',
+      author: 'Something',
+      type: 'Скретч',
+      imageUrl: null,
+      likes: 25,
+      comments: 5,
+      views: 20
+    },
+    {
+      id: 3,
+      title: 'Мэднес комбат',
+      author: 'GamerDev12672',
+      type: 'Пост',
+      imageUrl: null,
+      likes: 37,
+      comments: 8,
+      views: 20
+    },
+    {
+      id: 4,
+      title: 'Когда я выучу реакт и хоноо',
+      author: 'CoderPro',
+      type: 'Видео',
+      imageUrl: null,
+      likes: 52,
+      comments: 15,
+      views: 20
+    },
   ]
 
   const handleTrendChange = (trend: 'day' | 'week' | 'month') => {
     setActiveTrend(trend)
+  }
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' })
+    }
   }
 
   return (
@@ -66,7 +168,7 @@ const Trends = () => {
           </button>
         </div>
       </div>
-      <div className="project-projects">
+      <div className="trends-projects">
         {projects.map(project => (
           <ProjectCard key={project.id} project={project} />
         ))}

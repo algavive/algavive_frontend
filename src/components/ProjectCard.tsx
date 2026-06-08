@@ -17,7 +17,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       <div className="tp-caption">{project.title}</div>
       <div className="tp-author">{project.author}</div>
       <div className="tp-likes">
-        {project.likes}❤ {project.comments}💬
+        {project.views}👁‍ {project.likes}❤ {project.comments}💬
       </div>
     </Link>
     </div>

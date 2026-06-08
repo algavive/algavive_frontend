@@ -151,6 +151,23 @@ button:active {
   background-color: #eeeeee;
   flex-wrap: wrap;
 }
+.trends-projects {
+  font-family: cursive;
+  display: flex;
+  padding: 0px 0px;
+  gap: 50px;
+  background-color: #eeeeee;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.trends-projects > * {
+  flex-shrink: 0;
+}
+
+.project-projects > * {
+  flex-shrink: 0;
+}
 .tp-card{
   width:200px;
 }
@@ -386,4 +403,60 @@ button:active {
   padding: 30px;
   text-align: center;
   color: #999;
+}
+
+/*PAGE PROJECT*/
+
+.PageProject{
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  padding: 100px;
+}
+
+.PageCard{
+  height: 400px;
+  width: 480px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  outline: 1px solid grey;
+}
+
+.PageCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.PageCardInfo {    
+  font-family: cursive;
+}
+
+.PCI-description {
+  height: 400px;
+  width: 480px;
+  overflow-y: auto;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  padding: 10px;
+  font-family: cursive;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+.PCI-description bdi {
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.PCI-description a {
+  color: darkmagenta;
+  text-decoration: underline;
+}
+
+.PCI-description a:hover {
+  color: #9b59b6;
 }

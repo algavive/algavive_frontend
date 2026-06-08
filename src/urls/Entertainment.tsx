@@ -38,7 +38,8 @@ useEffect(() => {
       type: 'Пост',
       imageUrl: null,
       likes: 15,
-      comments: 4
+      comments: 4,
+      views: 20
     }
 
 
