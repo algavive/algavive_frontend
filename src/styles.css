@@ -44,7 +44,7 @@ button:active {
 .button-RegOrLogin{
   text-decoration: none;
   color: #333;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   font-weight: 500;
   font-size: 16px;
   padding: 8px 20px;
@@ -77,7 +77,7 @@ button:active {
 .h-buttons a {
   text-decoration: none;
   color: #333;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   font-weight: 500;
   font-size: 16px;
   padding: 8px 20px;
@@ -104,7 +104,7 @@ button:active {
 }
 
 .h-profile-name {
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;  /* шрифт */
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   color: #333;  
 
   display: flex;
@@ -139,12 +139,12 @@ button:active {
 /*TRENDS*/
 .trends{
   display: flex;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   padding: 25px 0px;
 }
 /*PROJ TRENDS*/
 .project-projects{
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   display: flex;
   padding: 0px 0px;
   gap:50px;
@@ -152,7 +152,7 @@ button:active {
   flex-wrap: wrap;
 }
 .trends-projects {
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   display: flex;
   padding: 0px 0px;
   gap: 50px;
@@ -203,10 +203,10 @@ button:active {
 .createProject button {
   border-radius: 10px;
   background-color: #e0e0e0;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   font-size: 14px;
-  width:125px*2;
-  height:25px*2;
+  width:125px;
+  height:25px;
   transition: all 0.3s ease;
 }
 .createProject button:hover {
@@ -217,7 +217,7 @@ button:active {
   border-radius: 10px;
   background-color: #e0e0e0;
   cursor: pointer;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   font-size: 14px;
   font-weight: 500;
   color: #333;
@@ -236,7 +236,7 @@ button:active {
 .projects{
   display: flex;
   padding: 20px 5px;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive; 
   flex-wrap: wrap;
 }
 
@@ -325,7 +325,7 @@ button:active {
 .search-button-wrapper{
   transition: all 0.3s ease;
   border-radius: 10px;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
 }
 
 .search-button-wrapper:hover {
@@ -335,7 +335,7 @@ button:active {
 .notification-button-wrapper{
   transition: all 0.3s ease;
   border-radius: 10px;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
 }
 
 .notification-button-wrapper:hover {
@@ -431,17 +431,16 @@ button:active {
 }
 
 .PageCardInfo {    
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
 }
 
 .PCI-description {
-  height: 400px;
   width: 480px;
   overflow-y: auto;
   word-wrap: break-word;
   white-space: pre-wrap;
   padding: 10px;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
   line-height: 1.5;
   font-size: 16px;
 }
@@ -459,4 +458,188 @@ button:active {
 
 .PCI-description a:hover {
   color: #9b59b6;
+}
+
+.PCI-Profile {
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.JustProfile {
+  height: 40px; 
+  width: auto;   
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.PCI-likebutton {
+  height: 100px;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.PCI-likebutton img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+.CommentPage {
+  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  display: flex;
+  justify-content: space-around;
+}
+
+.TextInput{
+  width: 999px;
+}
+
+
+/*Комментарии под проектом*/
+
+.TextInput {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.TextInput input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.sendCommentBtn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sendCommentBtn:hover {
+  background-color: #0056b3;
+}
+
+.commentsList {
+  margin-top: 20px;
+}
+
+.commentItem {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+}
+
+.parentComment {
+  margin-bottom: 10px;
+}
+
+.childComment {
+  margin-left: 50px;
+  border-left: 2px solid #007bff;
+  padding-left: 15px;
+  margin-top: 10px;
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.commentAuthor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.commentAuthor:hover {
+  color: #007bff;
+}
+
+.commentAvatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+}
+
+.commentDate {
+  font-size: 12px;
+  color: #999;
+}
+
+.commentText {
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  padding-left: 40px;
+}
+
+.commentFooter {
+  padding-left: 40px;
+  display: flex;
+  gap: 15px;
+}
+
+.replyBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 13px;
+  padding: 5px 8px;
+  border-radius: 4px;
+}
+
+.replyBtn:hover {
+  background-color: #f0f0f0;
+  color: #007bff;
+}
+
+.replyForm {
+  margin-top: 10px;
+  margin-left: 40px;
+  display: flex;
+  gap: 10px;
+}
+
+.replyForm input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.replyForm button {
+  padding: 8px 15px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.replyForm .cancelReplyBtn {
+  background-color: #6c757d;
+}
+
+.replyForm button:hover {
+  opacity: 0.8;
+}
+
+.childComments {
+  margin-top: 10px;
 }

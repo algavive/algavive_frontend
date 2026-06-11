@@ -7,7 +7,7 @@ interface User {
 }
 
 export const user: User = {
-  logined: true,
+  logined: false,
   name: "John Doe",
   admin: true,
   avatarUrl: null
