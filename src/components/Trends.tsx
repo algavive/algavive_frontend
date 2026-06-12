@@ -25,7 +25,7 @@ const Trends = () => {
       type: 'Пост',
       imageUrl: null,
       likes: 37,
-      comments: 8,
+      comments: 5,
       views: 20
     },
     {

@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 
 const notifications = [
-  { id: 1, type: 'like', user: 'Анна', action: 'лайкнула ваш проект', target: 'Эмулятор NES', time: '5 мин назад', redirectUrl: '/project/nes-emulator' },
-  { id: 2, type: 'comment', user: 'Дмитрий', action: 'прокомментировал', target: '3D движок', time: 'час назад', redirectUrl: '/project/3d-engine' },
-  { id: 3, type: 'reply', user: 'Максим', action: 'ответил на комментарий', target: 'в проекте Эмулятор', time: 'вчера', redirectUrl: '/project/nes-emulator/comments' },
+  { id: 1, type: 'like', user: 'Анна', action: 'лайкнула ваш проект', target: 'Эмулятор NES', time: '5 мин назад', redirectUrl: '#' },
+  { id: 2, type: 'comment', user: 'Дмитрий', action: 'прокомментировал', target: '3D движок', time: 'час назад', redirectUrl: '#' },
+  { id: 3, type: 'reply', user: 'Максим', action: 'ответил на комментарий', target: 'в проекте Эмулятор', time: 'вчера', redirectUrl: '#' },
 ]
 
 const getIcon = (type: string): string => {

@@ -1,4 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
+
+import Admin from './urls/Admin'
+import Settings from './urls/Settings'
+
 import Header from './Header'
 import Home from './urls/Home'
 import HallOfFame from './urls/HallOfFame'
@@ -10,8 +14,11 @@ import ResetPass from './urls/ResetPass'
 
 import Entertainment from './urls/Entertainment'
 import MyProjects from './urls/MyProjects'
-
 import Project from './urls/Project'
+import Search from './urls/Search'
+
+import MyProfile from './urls/MyProfile'
+import User from './urls/User'
 
 export default function App() {
   return (
@@ -27,6 +34,11 @@ export default function App() {
         <Route path="/resetpass" element={<ResetPass />} />
         <Route path="/my-projects" element={<MyProjects />} />
         <Route path="/project" element={<Project />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/my-profile" element={<MyProfile />} />
+        <Route path="/user" element={<User />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>
   )

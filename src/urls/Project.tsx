@@ -7,17 +7,18 @@ export default function Project() {
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
   
-  const projectData = {
+  const [projectData, setProjectData] = useState({
     title: "Мэднесс комбат",
     type: "Пост",
     author: "GamerDev12672",
     authorId: 8273983,
-    views: 3434,
-    likes: 4545645,
-    commentsCount: 456345654,
+    views: 20,
+    likes: 37,
+    isLiked: false,
+    commentsCount: 5,
     description: `Добро пожаловать в мэднесс комбат!\n\nЕсли хотите поиграть то переходите по ссылке https://madness.com`,
     coverImage: `${config.STATIC_LOCATION}/cover.png`
-  }
+  })
 
   const [commentsData, setCommentsData] = useState([
     {
@@ -33,6 +34,13 @@ export default function Project() {
           authorId: 5555555,
           text: "Согласен, лучшая игра в этом году!",
           date: "2024-01-15"
+        },
+        {
+          id: 4,
+          author: "NoobMaster",
+          authorId: 7777777,
+          text: "Полностью поддерживаю!",
+          date: "2024-01-16"
         }
       ]
     },
@@ -42,13 +50,40 @@ export default function Project() {
       authorId: 1234567,
       text: "Когда будет обновление?",
       date: "2024-01-16",
-      replies: []
+      replies: [
+        {
+          id: 5,
+          author: "GamerDev12672",
+          authorId: 8273983,
+          text: "На следующей неделе!",
+          date: "2024-01-17"
+        }
+      ]
     }
   ])
 
   const [mainInput, setMainInput] = useState('')
   const [replyInputs, setReplyInputs] = useState({})
   const [showReplyForms, setShowReplyForms] = useState({})
+  const [collapsedReplies, setCollapsedReplies] = useState({
+    1: true,
+    3: true
+  })
+
+  const toggleProjectLike = () => {
+    setProjectData({
+      ...projectData,
+      isLiked: !projectData.isLiked,
+      likes: projectData.isLiked ? projectData.likes - 1 : projectData.likes + 1
+    })
+  }
+
+  const toggleReplies = (commentId) => {
+    setCollapsedReplies({
+      ...collapsedReplies,
+      [commentId]: !collapsedReplies[commentId]
+    })
+  }
 
   const addMainComment = () => {
     if (mainInput.trim() === '') return
@@ -62,7 +97,7 @@ export default function Project() {
       replies: []
     }
     
-    setCommentsData([...commentsData, newComment])
+    setCommentsData([newComment, ...commentsData])
     setMainInput('')
   }
 
@@ -93,7 +128,7 @@ export default function Project() {
       if (comment.id === parentId) {
         return {
           ...comment,
-          replies: [...comment.replies, newReply]
+          replies: [newReply, ...comment.replies]
         }
       }
       return comment
@@ -108,6 +143,13 @@ export default function Project() {
       ...showReplyForms,
       [parentId]: false
     })
+    
+    if (collapsedReplies[parentId]) {
+      setCollapsedReplies({
+        ...collapsedReplies,
+        [parentId]: false
+      })
+    }
   }
   
   return (
@@ -140,7 +182,12 @@ export default function Project() {
           </div>
           
           <div className="PCI-likebutton">
-            <button><img src={`${config.STATIC_LOCATION}/likebutton.png`} alt="like" /></button>
+            <button onClick={toggleProjectLike}>
+              <img 
+                src={projectData.isLiked ? `${config.STATIC_LOCATION}/likebutton_pressed.png` : `${config.STATIC_LOCATION}/likebutton.png`} 
+                alt="like" 
+              />
+            </button>
           </div>
         </div>
       </div>
@@ -175,6 +222,11 @@ export default function Project() {
                 
                 <div className="commentFooter">
                   <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>Ответить</button>
+                  {comment.replies.length > 0 && (
+                    <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
+                      {collapsedReplies[comment.id] ? `Показать ответы (${comment.replies.length})` : `Скрыть ответы (${comment.replies.length})`}
+                    </button>
+                  )}
                 </div>
                 
                 {showReplyForms[comment.id] && (
@@ -194,7 +246,7 @@ export default function Project() {
                   </div>
                 )}
                 
-                {comment.replies.length > 0 && (
+                {comment.replies.length > 0 && !collapsedReplies[comment.id] && (
                   <div className="childComments">
                     {comment.replies.map(reply => (
                       <div key={reply.id} className="childComment">

@@ -44,7 +44,7 @@ button:active {
 .button-RegOrLogin{
   text-decoration: none;
   color: #333;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-weight: 500;
   font-size: 16px;
   padding: 8px 20px;
@@ -77,7 +77,7 @@ button:active {
 .h-buttons a {
   text-decoration: none;
   color: #333;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-weight: 500;
   font-size: 16px;
   padding: 8px 20px;
@@ -104,7 +104,7 @@ button:active {
 }
 
 .h-profile-name {
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   color: #333;  
 
   display: flex;
@@ -139,12 +139,12 @@ button:active {
 /*TRENDS*/
 .trends{
   display: flex;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   padding: 25px 0px;
 }
 /*PROJ TRENDS*/
 .project-projects{
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: flex;
   padding: 0px 0px;
   gap:50px;
@@ -152,7 +152,7 @@ button:active {
   flex-wrap: wrap;
 }
 .trends-projects {
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: flex;
   padding: 0px 0px;
   gap: 50px;
@@ -203,7 +203,7 @@ button:active {
 .createProject button {
   border-radius: 10px;
   background-color: #e0e0e0;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-size: 14px;
   width:125px;
   height:25px;
@@ -217,7 +217,7 @@ button:active {
   border-radius: 10px;
   background-color: #e0e0e0;
   cursor: pointer;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-size: 14px;
   font-weight: 500;
   color: #333;
@@ -236,7 +236,7 @@ button:active {
 .projects{
   display: flex;
   padding: 20px 5px;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive; 
+  font-family: 'Bahnschrift SemiCondensed', Arial; 
   flex-wrap: wrap;
 }
 
@@ -325,7 +325,7 @@ button:active {
 .search-button-wrapper{
   transition: all 0.3s ease;
   border-radius: 10px;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .search-button-wrapper:hover {
@@ -335,7 +335,7 @@ button:active {
 .notification-button-wrapper{
   transition: all 0.3s ease;
   border-radius: 10px;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .notification-button-wrapper:hover {
@@ -431,7 +431,7 @@ button:active {
 }
 
 .PageCardInfo {    
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .PCI-description {
@@ -440,7 +440,7 @@ button:active {
   word-wrap: break-word;
   white-space: pre-wrap;
   padding: 10px;
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   line-height: 1.5;
   font-size: 16px;
 }
@@ -490,7 +490,7 @@ button:active {
 
 
 .CommentPage {
-  font-family: 'Bahnschrift SemiCondensed', Arial, cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: flex;
   justify-content: space-around;
 }
@@ -642,4 +642,97 @@ button:active {
 
 .childComments {
   margin-top: 10px;
+}
+
+.collapseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #007bff;
+  font-size: 13px;
+  padding: 5px 8px;
+  border-radius: 4px;
+}
+
+.collapseBtn:hover {
+  background-color: #f0f0f0;
+}
+
+/*Профили*/
+
+.MyProfile {
+  display: flex;
+  justify-content: center;
+  padding: 100px;
+}
+.MPLS-img {
+  height: 300px; 
+  width: auto;   
+  object-fit: contain;
+  border-radius: 180px;
+}
+.MPLS-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.MPLS-button:hover {
+  background-color: #0056b3;
+}
+.MPLS-button-text{
+  color: white;
+  font-size: 24px;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
+}
+
+.MPRS-Name {
+  font-size: 24px;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
+}
+
+.MPRS-Desc {
+  padding: 50px 0px;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.MPRS-Desc a {
+  color: darkmagenta;
+  text-decoration: underline;
+}
+
+.MPRS-Desc a:hover {
+  color: #9b59b6;
+}
+
+.MPRS-button {
+  background-color: #007788;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.MPRS-button:hover {
+  background-color: #006677;
+}
+
+.MPRS-button-text {
+  color: white;
+  font-size: 24px;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
+}
+
+.SettingsLink {
+  font-family: 'Bahnschrift SemiCondensed', Arial;
 }

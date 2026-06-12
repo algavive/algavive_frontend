@@ -5,16 +5,15 @@ import type { Project } from '../types'
 import * as config from '../config'
 import Linkify from 'linkify-react';
 
-export default function MyProfile(){
+export default function User(){
 
-	const testdesc = `Hello everyone, bla bla bla bla bla, im thinking bla
-At the end of this check my github: github.com/dolbarezka`
+	const testdesc = `чекни мой мэднесс комбат`
 
 	const projects: Project[] = [
     {
       id: 380,
-      title: 'Первый проект',
-      author: 'John Doe',
+      title: 'Мэднесс комбат',
+      author: 'GamerDev12672',
       type: 'Пост',
       imageUrl: null,
       likes: 15,
@@ -30,17 +29,14 @@ At the end of this check my github: github.com/dolbarezka`
 			<div className="MyProfile">
 				<div className="MP-left-side">
 					<img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="MPLS-img" />
-					<div className="MPLS-button"><button><div className="MPLS-button-text">Изменить аватар</div></button></div>
 				</div>
 				<div className="MP-right-side">
-					<div className="MPRS-Name">John Doe</div>
-					<div className="MPRS-button"><button><div className="MPRS-button-text">Изменить описание</div></button></div>
+					<div className="MPRS-Name">GamerDev12672</div>
 					<div className="MPRS-Desc">
 						<Linkify>{testdesc}</Linkify>
 					</div>
 				</div>
 			</div>
-			<Link to="/settings"><div className="SettingsLink">Мои настройки</div></Link>
 			<div className="projects">
         <div className="p-title">Проекты пользователя:</div>
         <div className="p-buttons">
