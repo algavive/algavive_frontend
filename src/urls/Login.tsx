@@ -3,6 +3,8 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import * as config from '../config.ts';
 import { Link } from 'react-router-dom'
+import { useGoogleAuth, handleGoogleAuth } from '../components/GoogleAuth';
+
 
 export default function Login(){
 	const [isLoading, setIsLoading] = useState(false);
@@ -27,11 +29,20 @@ export default function Login(){
         {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         {success && <div style={{ color: 'green', marginTop: '10px' }}>{success}</div>}
 			<input type="submit" value="Войти" />
-			<h1>Восстановление пароля</h1>
-			<h3>Работает с аккаунтами, у кого эмейл и это пока экспериментально</h3>
-			<Link to="/resetpass">Забыли пароль?</Link>
-
 		</form>
+		<div className="oauth-divider">
+        		<span>или</span>
+      		</div>
+		
+		<h1>Восстановление пароля</h1>
+		<h3>Работает у аккаунтов с google oauth</h3>
+		<Link to="/resetpass">Забыли пароль?</Link>
 		</div>
 		)
 }
+
+/*
+<h1>Восстановление пароля</h1>
+			<h3>Работает с аккаунтами, у кого эмейл и это пока экспериментально</h3>
+			<Link to="/resetpass">Забыли пароль?</Link>
+*/

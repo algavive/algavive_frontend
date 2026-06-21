@@ -133,7 +133,7 @@ button:active {
   display: flex;
   flex-direction: column;
   padding: 39px 25px;
-  font-family: cursive;
+  font-family: 'Bahnschrift SemiCondensed', Arial;
   gap: 20px;
 }
 /*TRENDS*/
