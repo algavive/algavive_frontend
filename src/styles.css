@@ -1,6 +1,10 @@
 /*вся css логика*/
 
 /*MAIN*/
+* {
+   font-family: 'Bahnschrift SemiCondensed', Arial;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -44,7 +48,6 @@ button:active {
 .button-RegOrLogin{
   text-decoration: none;
   color: #333;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-weight: 500;
   font-size: 16px;
   padding: 8px 20px;
@@ -77,7 +80,6 @@ button:active {
 .h-buttons a {
   text-decoration: none;
   color: #333;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-weight: 500;
   font-size: 16px;
   padding: 8px 20px;
@@ -104,7 +106,6 @@ button:active {
 }
 
 .h-profile-name {
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   color: #333;  
 
   display: flex;
@@ -123,7 +124,6 @@ button:active {
 
 
 .h-title{
-  font-family: 'Bahnschrift SemiCondensed';
   font-size: 36px;
 }
 /*Login and Register form*/
@@ -133,18 +133,15 @@ button:active {
   display: flex;
   flex-direction: column;
   padding: 39px 25px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   gap: 20px;
 }
 /*TRENDS*/
 .trends{
   display: flex;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   padding: 25px 0px;
 }
 /*PROJ TRENDS*/
 .project-projects{
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: flex;
   padding: 0px 0px;
   gap:50px;
@@ -152,7 +149,6 @@ button:active {
   flex-wrap: wrap;
 }
 .trends-projects {
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: flex;
   padding: 0px 0px;
   gap: 50px;
@@ -170,18 +166,26 @@ button:active {
 }
 .tp-card{
   width:200px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .tp-card a{
     color: #333;
 }
 .tp-img img{
   width:100%;
+  height: 100%;
   border-radius: 10px; 
 }
-.tp-img{
-  position: relative;
-
+.tp-img {
+  width: 100%;
+  height: 150px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 10px;
 }
+
 .tp-type{
   display: flex;
   position: absolute;
@@ -190,34 +194,16 @@ button:active {
   background-color: #eeeeee;
 }
 
+
 .t-buttons, .p-buttons {
   display: flex;
   gap: 12px;
-}
-
-.createProject {
-  display: flex;
-  padding: 20px 15px;
-}
-
-.createProject button {
-  border-radius: 10px;
-  background-color: #e0e0e0;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
-  font-size: 14px;
-  width:125px;
-  height:25px;
-  transition: all 0.3s ease;
-}
-.createProject button:hover {
-  background-color: #efefef;
 }
 
 .t-buttons button, .p-buttons button {
   border-radius: 10px;
   background-color: #e0e0e0;
   cursor: pointer;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   font-size: 14px;
   font-weight: 500;
   color: #333;
@@ -236,7 +222,6 @@ button:active {
 .projects{
   display: flex;
   padding: 20px 5px;
-  font-family: 'Bahnschrift SemiCondensed', Arial; 
   flex-wrap: wrap;
 }
 
@@ -325,7 +310,6 @@ button:active {
 .search-button-wrapper{
   transition: all 0.3s ease;
   border-radius: 10px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .search-button-wrapper:hover {
@@ -335,7 +319,6 @@ button:active {
 .notification-button-wrapper{
   transition: all 0.3s ease;
   border-radius: 10px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .notification-button-wrapper:hover {
@@ -430,9 +413,7 @@ button:active {
   object-fit: contain;
 }
 
-.PageCardInfo {    
-  font-family: 'Bahnschrift SemiCondensed', Arial;
-}
+.PageCardInfo {}
 
 .PCI-description {
   width: 480px;
@@ -440,7 +421,6 @@ button:active {
   word-wrap: break-word;
   white-space: pre-wrap;
   padding: 10px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   line-height: 1.5;
   font-size: 16px;
 }
@@ -490,7 +470,6 @@ button:active {
 
 
 .CommentPage {
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: flex;
   justify-content: space-around;
 }
@@ -664,6 +643,7 @@ button:active {
   display: flex;
   justify-content: center;
   padding: 100px;
+  gap: 50px;
 }
 .MPLS-img {
   height: 300px; 
@@ -688,20 +668,18 @@ button:active {
 .MPLS-button-text{
   color: white;
   font-size: 24px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .MPRS-Name {
   font-size: 24px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
 .MPRS-Desc {
   padding: 50px 0px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
   display: block;
   white-space: pre-wrap;
   word-wrap: break-word;
+  width: 500px;
 }
 .MPRS-Desc a {
   color: darkmagenta;
@@ -730,9 +708,275 @@ button:active {
 .MPRS-button-text {
   color: white;
   font-size: 24px;
-  font-family: 'Bahnschrift SemiCondensed', Arial;
 }
 
-.SettingsLink {
-  font-family: 'Bahnschrift SemiCondensed', Arial;
+.SettingsLink {}
+
+/*Modal windows*/
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+  background: #f5f5f5;
+}
+
+.btn-create {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-create:hover {
+  background: #0056b3;
+}
+
+.image-preview {
+  margin-top: 10px;
+}
+
+.createProject{
+  height:50px;
+}
+
+.createProject button {
+  padding: 6px 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.createProject button:hover {
+  background: #0056b3;
+}
+/**/
+.PCI-editbutton {}
+
+.edit-btn {
+  padding: 10px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.edit-btn:hover {
+  background: #45a049;
+}
+
+
+.PageCard {
+  position: relative;
+}
+
+.fullscreen-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-content {
+  position: relative;
+  width: 95vw;
+  height: 95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s;
+}
+
+.fullscreen-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.warning-overlay {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.warning-overlay p {
+  color: #856404;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.warning-overlay button {
+  padding: 10px 30px;
+  background: #ffc107;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.warning-overlay button:hover {
+  background: #e0a800;
+}
+
+.PCI-video video,
+.PCI-scratch iframe,
+.PCI-html iframe,
+.PCI-web iframe {
+  border-radius: 8px;
+  margin-top: 10px;
 }

@@ -6,6 +6,11 @@ import Linkify from 'linkify-react';
 export default function Project() {
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isFullscreenMedia, setIsFullscreenMedia] = useState(false)
+  const [fullscreenMediaIndex, setFullscreenMediaIndex] = useState(0)
+  const [urlInput, setUrlInput] = useState('')
   
   const [projectData, setProjectData] = useState({
     title: "Мэднесс комбат",
@@ -17,7 +22,16 @@ export default function Project() {
     isLiked: false,
     commentsCount: 5,
     description: `Добро пожаловать в мэднесс комбат!\n\nЕсли хотите поиграть то переходите по ссылке https://madness.com`,
-    coverImage: `${config.STATIC_LOCATION}/cover.png`
+    imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+    content: '',
+    isOwner: true
+  })
+
+  const [editData, setEditData] = useState({
+    title: projectData.title,
+    description: projectData.description,
+    imageUrl: projectData.imageUrl,
+    content: projectData.content || []
   })
 
   const [commentsData, setCommentsData] = useState([
@@ -65,10 +79,7 @@ export default function Project() {
   const [mainInput, setMainInput] = useState('')
   const [replyInputs, setReplyInputs] = useState({})
   const [showReplyForms, setShowReplyForms] = useState({})
-  const [collapsedReplies, setCollapsedReplies] = useState({
-    1: true,
-    3: true
-  })
+  const [collapsedReplies, setCollapsedReplies] = useState({ 1: true, 3: true })
 
   const toggleProjectLike = () => {
     setProjectData({
@@ -135,28 +146,266 @@ export default function Project() {
     })
     
     setCommentsData(updatedComments)
-    setReplyInputs({
-      ...replyInputs,
-      [parentId]: ''
-    })
-    setShowReplyForms({
-      ...showReplyForms,
-      [parentId]: false
-    })
+    setReplyInputs({ ...replyInputs, [parentId]: '' })
+    setShowReplyForms({ ...showReplyForms, [parentId]: false })
     
     if (collapsedReplies[parentId]) {
-      setCollapsedReplies({
-        ...collapsedReplies,
-        [parentId]: false
-      })
+      setCollapsedReplies({ ...collapsedReplies, [parentId]: false })
     }
   }
-  
+
+  const handleEditClick = () => {
+    setIsEditing(true)
+    setEditData({
+      title: projectData.title,
+      description: projectData.description,
+      imageUrl: projectData.imageUrl,
+      content: projectData.content || []
+    })
+    setUrlInput('')
+  }
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target
+    setEditData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleUrlImport = (type) => {
+    if (!urlInput.trim()) return
+    
+    const url = urlInput.trim()
+    const extension = url.split('.').pop()?.toLowerCase()
+    
+    if (type === 'imageUrl') {
+      setEditData(prev => ({ ...prev, imageUrl: url }))
+      setUrlInput('')
+    } else if (type === 'content') {
+      if (projectData.type === 'Scratch' && extension === 'sb3') {
+        setEditData(prev => ({ ...prev, content: url }))
+        setUrlInput('')
+      } else if (projectData.type === 'Видео' && ['mp4', 'webm', 'ogg', 'mov', 'avi'].includes(extension)) {
+        setEditData(prev => ({ ...prev, content: url }))
+        setUrlInput('')
+      } else if (projectData.type === 'Web') {
+        setEditData(prev => ({ ...prev, content: url }))
+        setUrlInput('')
+      } else {
+        alert('Неверный формат URL для этого типа проекта')
+      }
+    } else if (type === 'media') {
+      const mediaExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'tiff']
+      if (mediaExtensions.includes(extension)) {
+        const currentContent = Array.isArray(editData.content) ? editData.content : []
+        if (currentContent.length >= 10) {
+          alert('Максимум 10 медиа файлов')
+          return
+        }
+        setEditData(prev => ({
+          ...prev,
+          content: [...currentContent, url]
+        }))
+        setUrlInput('')
+      } else {
+        alert('Неверный формат медиа файла. Поддерживаются: png, jpg, gif, webp, svg, bmp, ico, tiff')
+      }
+    }
+  }
+
+  const handleSaveEdit = () => {
+    setProjectData(prev => ({
+      ...prev,
+      title: editData.title,
+      description: editData.description,
+      imageUrl: editData.imageUrl,
+      content: editData.content
+    }))
+    setIsEditing(false)
+  }
+
+  const deleteProject = () => {
+    alert("Проект удален")
+  }
+
+  const openFullscreen = () => {
+    if (projectData.type === 'Пост' && Array.isArray(projectData.content) && projectData.content.length > 0) {
+      setFullscreenMediaIndex(0)
+      setIsFullscreenMedia(true)
+    } else {
+      setIsFullscreen(true)
+    }
+  }
+
+  const closeFullscreen = () => {
+    setIsFullscreen(false)
+    setIsFullscreenMedia(false)
+  }
+
+  const renderCardContent = () => {
+    switch (projectData.type) {
+      case 'Пост': {
+        const mediaArray = Array.isArray(projectData.content) ? projectData.content : []
+        const displayImage = mediaArray.length > 0 ? mediaArray[0] : projectData.imageUrl
+        
+        return (
+          <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+            <img 
+              src={displayImage} 
+              alt={projectData.title} 
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+            {mediaArray.length > 0 && (
+              <div style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                gap: '6px',
+                background: 'rgba(0,0,0,0.5)',
+                padding: '4px 10px',
+                borderRadius: '12px',
+                alignItems: 'center'
+              }}>
+                {mediaArray.map((_, idx) => (
+                  <span key={idx} style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: idx === fullscreenMediaIndex ? '#fff' : 'rgba(255,255,255,0.4)',
+                    transition: 'all 0.3s'
+                  }} />
+                ))}
+                <span style={{ color: '#fff', fontSize: '11px', marginLeft: '4px' }}>
+                  {mediaArray.length}
+                </span>
+              </div>
+            )}
+          </div>
+        )
+      }
+      case 'Видео':
+        return (
+          <video controls style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
+            <source src={projectData.content} />
+          </video>
+        )
+      case 'Scratch':
+        return (
+          <iframe 
+            src={`https://turbowarp.org/embed?project_url=${encodeURIComponent(projectData.content)}`}
+            width="100%" 
+            height="100%" 
+            allowtransparency="true" 
+            frameBorder="0" 
+            scrolling="no" 
+            allowFullScreen
+          />
+        )
+      case 'Web':
+        return (
+          <iframe 
+            src={projectData.content}
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            sandbox="allow-scripts allow-same-origin allow-forms"
+          />
+        )
+      default:
+        return null
+    }
+  }
+
+  const renderFullscreenContent = () => {
+    if (isFullscreenMedia && projectData.type === 'Пост' && Array.isArray(projectData.content) && projectData.content.length > 0) {
+      const currentMedia = projectData.content[fullscreenMediaIndex]
+      return (
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          <img 
+            src={currentMedia} 
+            alt="media" 
+            style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain' }}
+          />
+          <div style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            background: 'rgba(0,0,0,0.6)',
+            padding: '8px 16px',
+            borderRadius: '20px'
+          }}>
+            <button 
+              onClick={() => setFullscreenMediaIndex(prev => prev > 0 ? prev - 1 : projectData.content.length - 1)}
+              style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}
+            >
+              ◀
+            </button>
+            <span style={{ color: '#fff' }}>
+              {fullscreenMediaIndex + 1} / {projectData.content.length}
+            </span>
+            <button 
+              onClick={() => setFullscreenMediaIndex(prev => prev < projectData.content.length - 1 ? prev + 1 : 0)}
+              style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}
+            >
+              ▶
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    switch (projectData.type) {
+      case 'Пост':
+        return (
+          <img 
+            src={projectData.imageUrl} 
+            alt={projectData.title} 
+            style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }} 
+          />
+        )
+      case 'Видео':
+        return (
+          <video controls autoPlay style={{ width: '100%', height: '90vh', objectFit: 'contain' }}>
+            <source src={projectData.content} />
+          </video>
+        )
+      case 'Scratch':
+        return (
+          <iframe 
+            src={`https://turbowarp.org/embed?project_url=${encodeURIComponent(projectData.content)}`}
+            style={{ width: '100%', height: '90vh', border: 'none' }}
+            allowtransparency="true" 
+            frameBorder="0" 
+            scrolling="no" 
+            allowFullScreen
+          />
+        )
+      case 'Web':
+        return (
+          <iframe 
+            src={projectData.content}
+            style={{ width: '100%', height: '90vh', border: 'none' }}
+            sandbox="allow-scripts allow-same-origin allow-forms"
+          />
+        )
+      default:
+        return null
+    }
+  }
+
   return (
     <>
       <div className="PageProject">
         <div className="PageCard">
-          <img src={projectData.coverImage} alt={projectData.title} />
+          {renderCardContent()}
+          <button className="fullscreen-btn" onClick={openFullscreen}>
+            🔍
+          </button>
         </div>
 
         <div className="PageCardInfo">
@@ -189,8 +438,202 @@ export default function Project() {
               />
             </button>
           </div>
+
+          {projectData.isOwner && (
+            <div className="PCI-editbutton">
+              <button onClick={handleEditClick} className="edit-btn">
+                ✏️ Изменить проект
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      {isEditing && (
+        <div className="modal-overlay" onClick={() => setIsEditing(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Редактировать проект</h2>
+              <button className="modal-close" onClick={() => setIsEditing(false)}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Название проекта</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editData.title}
+                  onChange={handleEditChange}
+                  maxLength={100}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Описание</label>
+                <textarea
+                  name="description"
+                  value={editData.description}
+                  onChange={handleEditChange}
+                  rows={4}
+                  maxLength={500}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Обложка проекта (URL)</label>
+                <div className="url-import-section">
+                  <input
+                    type="text"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    placeholder="Вставьте ссылку на изображение..."
+                    style={{ width: '70%', marginRight: '10px' }}
+                  />
+                  <button onClick={() => handleUrlImport('imageUrl')} className="btn-import">
+                    Установить
+                  </button>
+                </div>
+                {editData.imageUrl && (
+                  <img 
+                    src={editData.imageUrl} 
+                    alt="Preview" 
+                    style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '10px', objectFit: 'contain' }}
+                  />
+                )}
+              </div>
+
+              {projectData.type === 'Пост' && (
+                <div className="form-group">
+                  <label>Медиа файлы (до 10 шт) - PNG, JPG, GIF, WEBP</label>
+                  <div className="url-import-section">
+                    <input
+                      type="text"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      placeholder="Вставьте ссылку на медиа..."
+                      style={{ width: '70%', marginRight: '10px' }}
+                    />
+                    <button onClick={() => handleUrlImport('media')} className="btn-import">
+                      Добавить
+                    </button>
+                  </div>
+                  {Array.isArray(editData.content) && editData.content.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                      {editData.content.map((url, idx) => (
+                        <div key={idx} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                          <img 
+                            src={url} 
+                            alt={`media-${idx}`} 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+                          />
+                          <button 
+                            onClick={() => {
+                              setEditData(prev => ({
+                                ...prev,
+                                content: prev.content.filter((_, i) => i !== idx)
+                              }))
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '-5px',
+                              right: '-5px',
+                              background: 'red',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '20px',
+                              height: '20px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                    {Array.isArray(editData.content) ? editData.content.length : 0}/10 медиа файлов
+                  </div>
+                </div>
+              )}
+
+              {projectData.type !== 'Пост' && projectData.type !== 'Web' && (
+                <div className="form-group">
+                  <label>
+                    {projectData.type === 'Scratch' && 'Ссылка на .sb3 файл'}
+                    {projectData.type === 'Видео' && 'Ссылка на видео'}
+                  </label>
+                  <div className="url-import-section">
+                    <input
+                      type="text"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      placeholder="Вставьте ссылку..."
+                      style={{ width: '70%', marginRight: '10px' }}
+                    />
+                    <button onClick={() => handleUrlImport('content')} className="btn-import">
+                      Импорт
+                    </button>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                    {projectData.type === 'Scratch' && 'Поддерживаются .sb3 файлы'}
+                    {projectData.type === 'Видео' && 'Поддерживаются: mp4, webm, ogg, mov, avi'}
+                  </div>
+                </div>
+              )}
+
+              {projectData.type === 'Web' && (
+                <div className="form-group">
+                  <label>Ссылка на сайт</label>
+                  <input
+                    type="text"
+                    name="content"
+                    value={editData.content}
+                    onChange={handleEditChange}
+                    placeholder="https://..."
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>Текущий контент:</label>
+                <div className="current-content">
+                  {projectData.type === 'Пост' ? (
+                    <span>Медиа: {Array.isArray(editData.content) ? editData.content.length : 0} файлов</span>
+                  ) : projectData.type === 'Scratch' ? (
+                    <span>.sb3 файл по ссылке</span>
+                  ) : projectData.type === 'Видео' ? (
+                    <span>Видео по ссылке</span>
+                  ) : projectData.type === 'Web' ? (
+                    <span>{editData.content || 'Не указан'}</span>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn-cancel" onClick={() => setIsEditing(false)}>Отмена</button>
+              <button className="btn-create" onClick={handleSaveEdit}>Сохранить</button>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-create" style={{background:'red'}} onClick={deleteProject}>Удалить Проект</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {(isFullscreen || isFullscreenMedia) && (
+        <div className="fullscreen-overlay" onClick={closeFullscreen}>
+          <div className="fullscreen-content" onClick={(e) => e.stopPropagation()}>
+            <button className="fullscreen-close" onClick={closeFullscreen}>×</button>
+            {renderFullscreenContent()}
+          </div>
+        </div>
+      )}
 
       <div className="CommentPage">
         <div>

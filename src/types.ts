@@ -24,3 +24,4 @@ export interface PageProject {
 
 export type TrendPeriod = 'day' | 'week' | 'month'
 export type ProjectFilter = 'new' | 'popular' | 'discussed'
+export type ProjectsTypes = 'Пост' | 'Видео' | 'Scratch' | 'Web'  

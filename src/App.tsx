@@ -37,7 +37,6 @@ export default function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/user" element={<User />} />
-        <Route path="/admin" element={<Admin />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>

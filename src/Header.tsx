@@ -3,7 +3,6 @@ import * as config from './config'
 import { ProfileHeader } from './components/ProfileHeader'
 import { SearchButton } from './components/SearchButton'
 import { NotificationButton } from './components/NotificationButton'
-import { user } from './components/Profile'
 
 const Header = () => {
   return (
@@ -19,7 +18,7 @@ const Header = () => {
           <Link to="/hall-of-fame">Зал Славы</Link>
           <Link to="/my-projects">Мои проекты</Link>
           <Link to="/entertainment">Центр Развлечений</Link>
-          {user.admin && <Link to="/admin">Админ-права</Link>}
+          <Link to="/settings">Настройки</Link>
         </div>
       </div>
 

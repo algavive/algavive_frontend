@@ -48,8 +48,13 @@ useEffect(() => {
   const handleFilterChange = (filter: 'new' | 'popular' | 'discussed') => {
     setActiveFilter(filter)
   }
-/*
-     	
+  return (
+    <>
+      <div className="projects">
+        <div className="p-title">Центр развлечений:</div>
+        <div className="p-buttons">
+          <div className="p-buttons">
+          {/* Кнопки фильтров */}
           <button 
             className={activeFilter === 'new' ? 'active' : ''}
             onClick={() => handleFilterChange('new')}
@@ -68,16 +73,7 @@ useEffect(() => {
           >
             Обсуждаемые
           </button>
-
-
-
-*/
-  return (
-    <>
-      <div className="projects">
-        <div className="p-title">Центр развлечений:</div>
-        <div className="p-buttons">
-   
+        </div>
         </div>
       </div>
       <div className="project-projects">
