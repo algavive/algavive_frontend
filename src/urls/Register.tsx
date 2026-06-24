@@ -2,7 +2,7 @@ import { useState, useRef, FormEvent } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import * as config from '../config';
-import { useGoogleAuth, handleGoogleAuth } from '../components/GoogleAuth';
+import { useGoogleAuth } from '../components/GoogleAuth';
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,7 +12,7 @@ export default function Register() {
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { buttonRef } = useGoogleAuth(
+  const { buttonRef, isReady } = useGoogleAuth(
     async (userData) => {
       try {
         if (registrationMode !== 'google') {
@@ -30,30 +30,26 @@ export default function Register() {
         }
 
         const turnstileToken = turnstileRef.current?.getResponse();
-        
         if (!turnstileToken) {
           setError('Пожалуйста, подтвердите, что вы не робот');
           return;
         }
 
-        const response = await fetch(`${config.BACKEND_URL}/api/register`, {
+        const response = await fetch(`${config.BACKEND_URL}/api/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', // для работы с куками
+          credentials: 'include',
           body: JSON.stringify({
-            login: login,
-            pass: pass,
             googleToken: userData.token,
             turnstileToken: turnstileToken,
-            mode: 'google'
+            mode: 'register',
+            login: login
           }),
         });
 
         const data = await response.json();
-        
+
         if (response.ok) {
-          // Токен сохраняется в куках на бэкенде
-          // В ответе может приходить только сообщение об успехе
           setSuccess('Регистрация с Google успешна! Перенаправление...');
           setTimeout(() => {
             window.location.href = '/';
@@ -74,7 +70,7 @@ export default function Register() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (registrationMode === 'google') {
       setError('Используйте кнопку Google для регистрации');
       return;
@@ -106,7 +102,7 @@ export default function Register() {
       const response = await fetch(`${config.BACKEND_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // для работы с куками
+        credentials: 'include',
         body: JSON.stringify({
           login: login,
           pass: pass,
@@ -116,9 +112,8 @@ export default function Register() {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
-        // Токен сохраняется в куках на бэкенде
         setSuccess('Регистрация успешна! Перенаправление...');
         setTimeout(() => {
           window.location.href = '/';
@@ -139,7 +134,7 @@ export default function Register() {
     <div className="Entry">
       <form ref={formRef} onSubmit={handleSubmit}>
         <h1>Регистрация</h1>
-        
+
         <div className="registration-mode">
           <label>
             <input
@@ -150,7 +145,7 @@ export default function Register() {
             />
             Обычная регистрация
           </label>
-          
+
           <label>
             <input
               type="radio"
@@ -161,23 +156,22 @@ export default function Register() {
             Связать с Google аккаунтом
           </label>
         </div>
-        
+
         <h3>Введите логин:</h3>
         <input type="text" name="login" required disabled={isLoading} />
-        
+
         <h3>Введите пароль:</h3>
         <input type="password" name="pass" required disabled={isLoading} />
-        
+
         <Turnstile
           ref={turnstileRef}
           siteKey={config.SITEKEY_TURNSTILE}
           onError={() => setError('Ошибка загрузки капчи')}
         />
-        
+
         {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         {success && <div style={{ color: 'green', marginTop: '10px' }}>{success}</div>}
-        
-        {/* Кнопка обычной регистрации - показываем только в режиме local */}
+
         {registrationMode === 'local' && (
           <button
             type="submit"
@@ -197,17 +191,13 @@ export default function Register() {
           </button>
         )}
 
-        {/* Показываем Google только в режиме google */}
         {registrationMode === 'google' && (
-          <>
-          
-            <div style={{ marginTop: '10px', textAlign: 'center' }}>
-              <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                Нажмите кнопку для регистрации с Google
-              </p>
-              <div ref={buttonRef}></div>
-            </div>
-          </>
+          <div style={{ marginTop: '10px', textAlign: 'center' }}>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+              Нажмите кнопку для регистрации с Google
+            </p>
+            <div ref={buttonRef}></div>
+          </div>
         )}
       </form>
     </div>
