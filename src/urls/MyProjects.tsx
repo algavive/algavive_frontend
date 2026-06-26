@@ -1,11 +1,11 @@
 
 import { useState } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import type { Project } from '../types'
+import type { Project,ProjectFilter } from '../types'
 import * as config from '../config'
 
 export default function MyProjects() {
-  const [activeFilter, setActiveFilter] = useState<'new' | 'popular' | 'discussed'>('new')
+  const [activeFilter, setActiveFilter] = useState<ProjectFilter>('new')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [projects, setProjects] = useState<Project[]>([
     {

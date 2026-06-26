@@ -1,4 +1,4 @@
-import * as config from '../config'
+import * as config from './config'
 
 export interface Project {
   id: number
@@ -30,11 +30,10 @@ export interface PageProject {
   views: number
   description: string
 
-  imageUrl: string
   content: string | string[]
 }
 
-export interface UserCard {
+export interface UserCards {
   id: number
   name: string
   rankIcon?: string

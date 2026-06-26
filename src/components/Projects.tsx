@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import type { Project } from '../types'
+import type { Project, ProjectFilter } from '../types'
 import * as config from '../config'
 
 const Projects = () => {
-  const [activeFilter, setActiveFilter] = useState<'new' | 'popular' | 'discussed'>('new')
+  const [activeFilter, setActiveFilter] = useState<ProjectFilter>('new')
   
 
   /*
@@ -53,7 +53,7 @@ useEffect(() => {
     }
   ]
 
-  const handleFilterChange = (filter: 'new' | 'popular' | 'discussed') => {
+  const handleFilterChange = (filter: ProjectFilter) => {
     setActiveFilter(filter)
   }
 

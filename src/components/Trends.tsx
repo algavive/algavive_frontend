@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import type { Project } from '../types'
+import type { Project, TrendPeriod } from '../types'
 import * as config from '../config'
 
 const Trends = () => {
-  const [activeTrend, setActiveTrend] = useState<'day' | 'week' | 'month'>('day')
+  const [activeTrend, setActiveTrend] = useState<TrendPeriod>('day')
   const scrollRef = useRef<HTMLDivElement>(null)
 //Там api просто допишу
   const projects: Project[] = [
@@ -40,7 +40,7 @@ const Trends = () => {
     }
   ]
 
-  const handleTrendChange = (trend: 'day' | 'week' | 'month') => {
+  const handleTrendChange = (trend: TrendPeriod) => {
     setActiveTrend(trend)
   }
 
