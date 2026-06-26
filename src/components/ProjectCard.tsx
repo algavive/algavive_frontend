@@ -15,9 +15,18 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         <div className="tp-type">{project.type}</div>
       </div>
       <div className="tp-caption">{project.title}</div>
-      <div className="tp-author"><img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="JustProfile" 
-        style={{borderRadius: '36px'}}/>{project.author}<img src={`${config.STATIC_LOCATION}/seleba.png`} className="JustProfile" 
-        style={{borderRadius: '36px', height: '20px'}}/></div>
+      <div className="tp-author">
+      <img src={project.authorProfile ? project.authorProfile: `${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="JustProfile" 
+        style={{borderRadius: '36px'}}/>
+      <div className="tp-author-info">
+      <div style={{color: 'purple'}}>{project.authorTitle}</div> {/*надо попробовать сделать звании или типо titles*/}
+      <div className="tp-author-name">
+        {project.author}
+        <img src={project.authorIcon} className="JustProfile" 
+          style={{borderRadius: '36px', height: '20px'}}/> {/*А здесь либо селебрити либо иконки*/}
+      </div>
+    </div>
+  </div>
       <div className="tp-likes">
         {project.views}👁‍ {project.likes}👍 {project.comments}💬
       </div>

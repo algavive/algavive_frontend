@@ -1,12 +1,12 @@
-//Потом вставлю api kjubre
-interface User {
+//Потом вставлю в api
+interface UserClient {
 	logined: boolean
 	name: string
 	admin: boolean
 	avatarUrl: string | null
 }
 
-export const user: User = {
+export const user: UserClient = {
   logined: true,
   name: "John Doe",
   admin: true,

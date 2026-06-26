@@ -836,6 +836,34 @@ button:active {
   background: #0056b3;
 }
 
+.btn-publish {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #0000ff;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-publish:hover {
+  background: #0033ff;
+}
+
+.btn-publish-entertaiment {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: purple;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-publish-entertaiment:hover {
+  background: mediumpurple;
+}
+
 .image-preview {
   margin-top: 10px;
 }
@@ -979,4 +1007,47 @@ button:active {
 .PCI-web iframe {
   border-radius: 8px;
   margin-top: 10px;
+}
+/**/
+
+.tp-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tp-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tp-author-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+/**/
+
+.commentAuthor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.commentAuthorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.commentAuthorName {
+  font-weight: 500;
+}
+
+.commentRankTitle {
+  font-size: 11px;
+  color: purple;
 }

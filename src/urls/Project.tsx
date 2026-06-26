@@ -2,6 +2,8 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { useState } from 'react'
 import * as config from '../config'
 import Linkify from 'linkify-react';
+import {PageProject, Comment, Celebrity, EmptyCover} from '../types'
+
 
 export default function Project() {
   const [searchParams] = useSearchParams()
@@ -12,7 +14,8 @@ export default function Project() {
   const [fullscreenMediaIndex, setFullscreenMediaIndex] = useState(0)
   const [urlInput, setUrlInput] = useState('')
   
-  const [projectData, setProjectData] = useState({
+  const [projectData, setProjectData] = useState<PageProject>({
+    id: id,
     title: "Мэднесс комбат",
     type: "Пост",
     author: "GamerDev12672",
@@ -20,9 +23,9 @@ export default function Project() {
     views: 20,
     likes: 37,
     isLiked: false,
-    commentsCount: 5,
+    comments: 5,
     description: `Добро пожаловать в мэднесс комбат!\n\nЕсли хотите поиграть то переходите по ссылке https://madness.com`,
-    imageUrl: `${config.STATIC_LOCATION}/cover.png`,
+    imageUrl: EmptyCover,
     content: '',
     isOwner: true
   })
@@ -34,13 +37,15 @@ export default function Project() {
     content: projectData.content || []
   })
 
-  const [commentsData, setCommentsData] = useState([
+  const [commentsData, setCommentsData] = useState<Comment[]>([
     {
       id: 1,
       author: "GamerDev12672",
       authorId: 8273983,
       text: "Отличная игра! Всем рекомендую 🔥",
       date: "2024-01-15",
+      rankTitle: "Sigma",
+      rankIcon: Celebrity,
       replies: [
         {
           id: 2,
@@ -225,10 +230,6 @@ export default function Project() {
     setIsEditing(false)
   }
 
-  const deleteProject = () => {
-    alert("Проект удален")
-  }
-
   const openFullscreen = () => {
     if (projectData.type === 'Пост' && Array.isArray(projectData.content) && projectData.content.length > 0) {
       setFullscreenMediaIndex(0)
@@ -241,6 +242,19 @@ export default function Project() {
   const closeFullscreen = () => {
     setIsFullscreen(false)
     setIsFullscreenMedia(false)
+  }
+
+  /*Доделать функционал*/
+  const deleteProject = () => {
+    alert("Проект удален")
+  }
+
+  const handlePublish = () => {
+    alert("Проект опубликован в Зал Славы")
+  }
+
+  const handlePublishEntertaiment = () => {
+    alert("Проект опубликован в Центр Развлечений")
   }
 
   const renderCardContent = () => {
@@ -419,7 +433,7 @@ export default function Project() {
           </div>
           
           <div className="PCI-something">
-            {projectData.views}👁‍ {projectData.likes}👍 {projectData.commentsCount}💬
+            {projectData.views}👁‍ {projectData.likes}👍 {projectData.comments}💬
           </div>
           
           <div className="PCI-name">
@@ -618,7 +632,11 @@ export default function Project() {
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setIsEditing(false)}>Отмена</button>
               <button className="btn-create" onClick={handleSaveEdit}>Сохранить</button>
+              <button className="btn-publish" onClick={handlePublish}>Опубликовать</button>
             </div>
+            <div style={{gap: '20px'}}>
+            <button className="btn-publish-entertaiment" onClick={handlePublishEntertaiment}>Опубликовать в Центр Развлечений</button>
+          </div>
             <div className="modal-footer">
               <button className="btn-create" style={{background:'red'}} onClick={deleteProject}>Удалить Проект</button>
             </div>
@@ -651,63 +669,96 @@ export default function Project() {
           </div>
           
           <div className="commentsList">
-            {commentsData.map(comment => (
-              <div key={comment.id} className="commentItem">
-                <div className="commentHeader">
-                  <Link to={`/user?id=${comment.authorId}`} className="commentAuthor">
-                    <img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt="profile" className="commentAvatar" style={{ borderRadius: '50%' }} />
-                    <span>{comment.author}</span>
-                  </Link>
-                  <span className="commentDate">{comment.date}</span>
-                </div>
-                
-                <div className="commentText">{comment.text}</div>
-                
-                <div className="commentFooter">
-                  <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>Ответить</button>
-                  {comment.replies.length > 0 && (
-                    <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
-                      {collapsedReplies[comment.id] ? `Показать ответы (${comment.replies.length})` : `Скрыть ответы (${comment.replies.length})`}
-                    </button>
-                  )}
-                </div>
-                
-                {showReplyForms[comment.id] && (
-                  <div className="replyForm">
-                    <input 
-                      type="text" 
-                      placeholder="Написать ответ..." 
-                      value={replyInputs[comment.id] || ''}
-                      onChange={(e) => setReplyInputs({
-                        ...replyInputs,
-                        [comment.id]: e.target.value
-                      })}
-                      onKeyPress={(e) => e.key === 'Enter' && addReply(comment.id)}
-                    />
-                    <button onClick={() => addReply(comment.id)}>Отправить</button>
-                    <button className="cancelReplyBtn" onClick={() => showReplyForm(comment.id)}>Отмена</button>
-                  </div>
-                )}
-                
-                {comment.replies.length > 0 && !collapsedReplies[comment.id] && (
-                  <div className="childComments">
-                    {comment.replies.map(reply => (
-                      <div key={reply.id} className="childComment">
-                        <div className="commentHeader">
-                          <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
-                            <img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt="profile" className="commentAvatar" style={{ borderRadius: '50%' }} />
-                            <span>{reply.author}</span>
-                          </Link>
-                          <span className="commentDate">{reply.date}</span>
-                        </div>
-                        <div className="commentText">{reply.text}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+  {commentsData.map(comment => (
+    <div key={comment.id} className="commentItem">
+      <div className="commentHeader">
+        <Link to={`/user?id=${comment.authorId}`} className="commentAuthor">
+          <img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt="profile" className="commentAvatar" style={{ borderRadius: '50%' }} />
+          <div className="commentAuthorInfo">
+            <div className="commentAuthorNameWrapper">
+              <span className="commentAuthorName">{comment.author}</span>
+              {comment.rankIcon && (
+                <img 
+                  src={comment.rankIcon} 
+                  alt="rank" 
+                  style={{ height: '16px', width: '16px', marginLeft: '4px' }} 
+                />
+              )}
+            </div>
+            {comment.rankTitle && (
+              <span className="commentRankTitle" style={{ color: 'purple', fontSize: '11px' }}>
+                {comment.rankTitle}
+              </span>
+            )}
           </div>
+        </Link>
+        <span className="commentDate">{comment.date}</span>
+      </div>
+      
+      <div className="commentText">{comment.text}</div>
+      
+      <div className="commentFooter">
+        <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>Ответить</button>
+        {comment.replies.length > 0 && (
+          <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
+            {collapsedReplies[comment.id] ? `Показать ответы (${comment.replies.length})` : `Скрыть ответы (${comment.replies.length})`}
+          </button>
+        )}
+      </div>
+      
+      {showReplyForms[comment.id] && (
+        <div className="replyForm">
+          <input 
+            type="text" 
+            placeholder="Написать ответ..." 
+            value={replyInputs[comment.id] || ''}
+            onChange={(e) => setReplyInputs({
+              ...replyInputs,
+              [comment.id]: e.target.value
+            })}
+            onKeyPress={(e) => e.key === 'Enter' && addReply(comment.id)}
+          />
+          <button onClick={() => addReply(comment.id)}>Отправить</button>
+          <button className="cancelReplyBtn" onClick={() => showReplyForm(comment.id)}>Отмена</button>
+        </div>
+      )}
+      
+      {comment.replies.length > 0 && !collapsedReplies[comment.id] && (
+        <div className="childComments">
+          {comment.replies.map(reply => (
+            <div key={reply.id} className="childComment">
+              <div className="commentHeader">
+                <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
+                  <img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt="profile" className="commentAvatar" style={{ borderRadius: '50%' }} />
+                  <div className="commentAuthorInfo">
+                    <div className="commentAuthorNameWrapper">
+                      <span className="commentAuthorName">{reply.author}</span>
+                      {reply.rankIcon && (
+                        <img 
+                          src={reply.rankIcon} 
+                          alt="rank" 
+                          style={{ height: '16px', width: '16px', marginLeft: '4px' }} 
+                        />
+                      )}
+                    </div>
+                    {reply.rankTitle && (
+                      <span className="commentRankTitle" style={{ color: 'purple' }}>
+                        {reply.rankTitle}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+                <span className="commentDate">{reply.date}</span>
+              </div>
+              <div className="commentText">{reply.text}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
         </div>
       </div>
     </>
