@@ -12,7 +12,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "noUnusedLocals": false, /*Временно отключил проверки неиспользуемых переменных TS6133*/
+    "noUnusedLocals": false, /*noUnusedLocals*/
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },

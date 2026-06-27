@@ -25,7 +25,7 @@ export default function Search(){
     }
   ]
 
-  const users: User[] = [{
+  const users: UserCards[] = [{
     id: 2,
     name: "GamerDev12672",
     avatarUrl: null,

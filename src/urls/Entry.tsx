@@ -11,7 +11,7 @@ export default function Entry() {
   const [login, setLogin] = useState('');
   const turnstileRef = useRef<TurnstileInstance | null>(null);
 
-  const { buttonRef, isReady } = useGoogleAuth(
+  const { buttonRef } = useGoogleAuth(
     async (userData) => {
       try {
         const turnstileToken = turnstileRef.current?.getResponse();

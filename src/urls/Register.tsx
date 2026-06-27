@@ -12,7 +12,7 @@ export default function Register() {
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { buttonRef, isReady } = useGoogleAuth(
+  const { buttonRef } = useGoogleAuth(
     async (userData) => {
       try {
         if (registrationMode !== 'google') {

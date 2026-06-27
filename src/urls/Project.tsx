@@ -371,7 +371,7 @@ export default function Project() {
             src={`https://turbowarp.org/embed?project_url=${encodeURIComponent(scratchUrl)}`}
             width="100%"
             height="100%"
-            allowTransparency="true"
+            allowTransparency={true}
             frameBorder="0"
             scrolling="no"
             allowFullScreen
@@ -471,7 +471,7 @@ export default function Project() {
           <iframe
             src={`https://turbowarp.org/embed?project_url=${encodeURIComponent(scratchUrl)}`}
             style={{ width: '100%', height: '90vh', border: 'none' }}
-            allowTransparency="true"
+            allowTransparency={true}
             frameBorder="0"
             scrolling="no"
             allowFullScreen

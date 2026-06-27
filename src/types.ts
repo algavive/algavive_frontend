@@ -1,5 +1,15 @@
 import * as config from './config'
 
+export interface UserClient {
+  logined: boolean
+  name: string
+  admin: boolean
+  avatarUrl: string | null
+  description?: string | null
+  userIcon?: string
+  userTitle?: string
+}
+
 export interface Project {
   id: number
   title: string
@@ -47,7 +57,7 @@ export interface UserProfile {
   rankIcon?: string
   rankTitle?: string
   avatarUrl: null | string
-  desc: string
+  description?: string
 }
 
 export interface Reply {

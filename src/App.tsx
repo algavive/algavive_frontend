@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
 
-import Admin from './urls/Admin'
 import Settings from './urls/Settings'
 
 import Header from './Header'

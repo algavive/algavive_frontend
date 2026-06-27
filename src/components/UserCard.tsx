@@ -1,12 +1,13 @@
 import type { Project } from '../types'
 import { Link } from 'react-router-dom'
 import * as config from '../config'
+import {UserCards} from '../types'
 
 interface UserCardProps {
-  user: UserCard
+  user: UserCards
 }
 
-const UserCard = ({ user }: UserCard) => {
+const UserCard = ({ user }: UserCardProps) => {
   return (
     <div className="tp-card">
       <Link to={`/user?id=${user.id}`}>
