@@ -1,11 +1,13 @@
 import { useSearchParams, Link } from 'react-router-dom'
 import { useState } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import type { Project } from '../types'
+import { Project, ProjectFilter, Celebrity } from '../types'
 import * as config from '../config'
 import Linkify from 'linkify-react';
 
 export default function User(){
+
+	const [activeFilter, setActiveFilter] = useState<ProjectFilter>('new')
 
 	const testdesc = `чекни мой мэднесс комбат`
 
@@ -24,6 +26,11 @@ export default function User(){
 
   ]
 
+
+  const handleFilterChange = (filter: ProjectFilter) => {
+    setActiveFilter(filter)
+  }
+
 	return(
 		<>	
 			<div className="MyProfile">
@@ -31,7 +38,11 @@ export default function User(){
 					<img src={`${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="MPLS-img" />
 				</div>
 				<div className="MP-right-side">
-					<div className="MPRS-Name">GamerDev12672</div>
+					<div className="MPRS-Name">
+						GamerDev12672
+						<img src={Celebrity} style={{height: '24px'}}/>
+						<div style={{color: 'purple'}}>Sigma</div>
+				</div>
 					<div className="MPRS-Desc">
 						<Linkify>{testdesc}</Linkify>
 					</div>
@@ -40,7 +51,27 @@ export default function User(){
 			<div className="projects">
         <div className="p-title">Проекты пользователя:</div>
         <div className="p-buttons">
-   
+   				<div className="p-buttons">
+          {/* Кнопки фильтров */}
+          <button 
+            className={activeFilter === 'new' ? 'active' : ''}
+            onClick={() => handleFilterChange('new')}
+          >
+            Новые
+          </button>
+          <button 
+            className={activeFilter === 'popular' ? 'active' : ''}
+            onClick={() => handleFilterChange('popular')}
+          >
+            Популярные
+          </button>
+          <button 
+            className={activeFilter === 'discussed' ? 'active' : ''}
+            onClick={() => handleFilterChange('discussed')}
+          >
+            Обсуждаемые
+          </button>
+        </div>
         </div>
       </div>
       <div className="project-projects">

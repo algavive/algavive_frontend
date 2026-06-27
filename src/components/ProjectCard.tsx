@@ -19,12 +19,12 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       <img src={project.authorProfile ? project.authorProfile: `${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="JustProfile" 
         style={{borderRadius: '36px'}}/>
       <div className="tp-author-info">
-      <div style={{color: 'purple'}}>{project.authorTitle}</div> 
       <div className="tp-author-name">
         {project.author}
         <img src={project.authorIcon} className="JustProfile" 
           style={{borderRadius: '36px', height: '20px'}}/> 
       </div>
+      <div style={{color: 'purple', fontSize: '13px'}}>{project.authorTitle}</div> 
     </div>
   </div>
       <div className="tp-likes">

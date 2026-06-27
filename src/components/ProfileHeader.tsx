@@ -1,6 +1,6 @@
 import * as config from '../config'
 import { Link } from 'react-router-dom'
-import { user } from './Profile'
+import user from './Profile'
 
 export function ProfileHeader() {
 	if (user.logined) {

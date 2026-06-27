@@ -3,6 +3,7 @@ import { useState } from 'react'
 import ProjectCard from '../components/ProjectCard'
 import type { Project,ProjectFilter } from '../types'
 import * as config from '../config'
+import user from '../components/Profile'
 
 export default function MyProjects() {
   const [activeFilter, setActiveFilter] = useState<ProjectFilter>('new')
@@ -34,6 +35,7 @@ export default function MyProjects() {
   }
 
   const openModal = () => {
+    if(!user.logined) return
     setIsModalOpen(true)
   }
 

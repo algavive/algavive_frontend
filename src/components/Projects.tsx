@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ProjectCard from '../components/ProjectCard'
-import type { Project, ProjectFilter } from '../types'
+import { Project, ProjectFilter, Celebrity } from '../types'
 import * as config from '../config'
 
 const Projects = () => {
@@ -49,7 +49,9 @@ useEffect(() => {
       imageUrl: null,
       likes: 120,
       comments: 45,
-      views: 20
+      views: 20,
+      authorIcon: Celebrity,
+      authorTitle: 'Anything'
     }
   ]
 

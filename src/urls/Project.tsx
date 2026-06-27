@@ -3,6 +3,7 @@ import { useState, ChangeEvent } from 'react'
 import * as config from '../config'
 import Linkify from 'linkify-react'
 import { PageProject, Comments, Reply } from '../types'
+import user from '../components/Profile'
 
 type CommentType = Comments
 
@@ -53,7 +54,9 @@ export default function Project() {
           author: 'ProGamer',
           authorId: 5555555,
           text: 'Согласен, лучшая игра в этом году!',
-          date: '2024-01-15'
+          date: '2024-01-15',
+          rankTitle: 'Sigma',
+      rankIcon: `${config.STATIC_LOCATION}/seleba.png`
         },
         {
           id: 4,
@@ -102,12 +105,57 @@ export default function Project() {
     })
   }
 
+  const deleteComment = (commentId: number) => {
+    const comment = commentsData.find(c => c.id === commentId)
+    if (!comment) return
+
+    if (!user.admin && user.name !== comment.author) {
+      alert('Вы можете удалять только свои комментарии')
+      return
+    }
+    if (confirm('Удалить комментарий?')) {
+      setCommentsData(prev => prev.filter(c => c.id !== commentId))
+    }
+  }
+
+  const deleteReply = (commentId: number, replyId: number) => {
+    const comment = commentsData.find(c => c.id === commentId)
+    if (!comment) return
+    const reply = comment.replies.find(r => r.id === replyId)
+    if (!reply) return
+
+    if (!user.admin && user.name !== reply.author) {
+      alert('Вы можете удалять только свои ответы')
+      return
+    }
+    if (confirm('Удалить ответ?')) {
+      setCommentsData(prev =>
+        prev.map(c => {
+          if (c.id === commentId) {
+            return { ...c, replies: c.replies.filter(r => r.id !== replyId) }
+          }
+          return c
+        })
+      )
+    }
+  }
+
+  const removeProject = () => {
+    if (!user.admin) {
+      alert('Только администратор может снять проект с публикации')
+      return
+    }
+    if (confirm('Снять проект с публикации?')) {
+      alert('Проект снят с публикации')
+    }
+  }
+
   const addMainComment = () => {
     if (mainInput.trim() === '') return
-
+    if(!user.logined) alert("Вы не зашли в аккаунт"); return
     const newComment: CommentType = {
       id: Date.now(),
-      author: 'CurrentUser',
+      author: user.name,
       authorId: 9999999,
       text: mainInput,
       date: new Date().toISOString().split('T')[0],
@@ -135,7 +183,7 @@ export default function Project() {
 
     const newReply: Reply = {
       id: Date.now(),
-      author: 'CurrentUser',
+      author: user.name,
       authorId: 9999999,
       text: replyText,
       date: new Date().toISOString().split('T')[0]
@@ -246,7 +294,13 @@ export default function Project() {
   }
 
   const deleteProject = () => {
-    alert('Проект удален')
+    if (!user.admin && !projectData.isOwner) {
+      alert('У вас нет прав на удаление этого проекта')
+      return
+    }
+    if (confirm('Удалить проект?')) {
+      alert('Проект удален')
+    }
   }
 
   const handlePublish = () => {
@@ -494,6 +548,14 @@ export default function Project() {
               </button>
             </div>
           )}
+
+          {user.admin && (
+            <div className="PCI-editbutton">
+              <button onClick={removeProject} className="edit-btn" style={{ background: 'orange' }}>
+                Снять с публикации
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -673,14 +735,15 @@ export default function Project() {
                 Сохранить
               </button>
               <button className="btn-publish" onClick={handlePublish}>
-                Опубликовать
+                Опубликовать/Снять с публикации
               </button>
             </div>
+            {user.admin && (
             <div style={{ gap: '20px' }}>
               <button className="btn-publish-entertaiment" onClick={handlePublishEntertaiment}>
                 Опубликовать в Центр Развлечений
               </button>
-            </div>
+            </div>)}
             <div className="modal-footer">
               <button className="btn-create" style={{ background: 'red' }} onClick={deleteProject}>
                 Удалить Проект
@@ -747,7 +810,24 @@ export default function Project() {
                       )}
                     </div>
                   </Link>
-                  <span className="commentDate">{comment.date}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="commentDate">{comment.date}</span>
+                    {(user.admin || user.name === comment.author) && (
+                      <button
+                        onClick={() => deleteComment(comment.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'red',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="commentText">{comment.text}</div>
@@ -791,7 +871,7 @@ export default function Project() {
                     {comment.replies.map((reply: Reply) => (
                       <div key={reply.id} className="childComment">
                         <div className="commentHeader">
-                          <Link to={`/user?id={reply.authorId}`} className="commentAuthor">
+                          <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
                             <img
                               src={`${config.STATIC_LOCATION}/emptyprofile.png`}
                               alt="profile"
@@ -810,13 +890,30 @@ export default function Project() {
                                 )}
                               </div>
                               {reply.rankTitle && (
-                                <span className="commentRankTitle" style={{ color: 'purple', fontSize: '11px' }}>
+                                <span className="commentRankTitle" style={{ color: 'purple', fontSize: '13px' }}>
                                   {reply.rankTitle}
                                 </span>
                               )}
                             </div>
                           </Link>
-                          <span className="commentDate">{reply.date}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className="commentDate">{reply.date}</span>
+                            {(user.admin || user.name === reply.author) && (
+                              <button
+                                onClick={() => deleteReply(comment.id, reply.id)}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: 'red',
+                                  cursor: 'pointer',
+                                  fontSize: '16px',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className="commentText">{reply.text}</div>
                       </div>
