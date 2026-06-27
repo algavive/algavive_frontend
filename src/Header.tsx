@@ -4,6 +4,8 @@ import { ProfileHeader } from './components/ProfileHeader'
 import { SearchButton } from './components/SearchButton'
 import { NotificationButton } from './components/NotificationButton'
 
+import user from './components/Profile'
+
 const Header = () => {
   return (
     <div className="header">
@@ -18,7 +20,7 @@ const Header = () => {
           <Link to="/hall-of-fame">Зал Славы</Link>
           <Link to="/my-projects">Мои проекты</Link>
           <Link to="/entertainment">Центр Развлечений</Link>
-          <Link to="/settings">Настройки</Link>
+          {user.logined && (<Link to="/settings">Настройки</Link>)}
         </div>
       </div>
 

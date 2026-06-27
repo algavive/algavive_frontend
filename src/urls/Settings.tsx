@@ -4,4 +4,22 @@ import ProjectCard from '../components/ProjectCard'
 import type { Project } from '../types'
 import * as config from '../config'
 
-export default function Settings(){}
+import user from '../components/Profile'
+
+export default function Settings(){
+
+	const logout = () => {
+		fetch(`${config.BACKEND_URL}/api/logout`, {
+  			method: 'POST',
+  			credentials: 'include'
+		})
+		document.location = "/"
+	}
+
+	return (
+		<>
+		{ user.logined &&
+		(<button onClick={logout}>logout</button>)}
+		</>
+		)
+}
