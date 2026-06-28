@@ -10,6 +10,7 @@ export default function ResetPass() {
   const [success, setSuccess] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('')
   const turnstileRef = useRef<TurnstileInstance | null>(null);
 
   const { buttonRef } = useGoogleAuth(
@@ -57,21 +58,33 @@ export default function ResetPass() {
       setError(errorMessage);
     }
   );
-
+  return (<h1> Из-за производственного ада с демо релизом, я уберу страницу восстановления пароля </h1>)
+  /*
   return (
     <div className="Entry">
       <h1>Восстановление пароля</h1>
       <p style={{ color: '#666', marginBottom: '20px' }}>
-        Сброс пароля работает только для аккаунтов с привязанным Google OAuth
+        {`Сброс пароля работает только для аккаунтов с привязанным Google OAuth.`}
       </p>
+      <h4>Если вы заранее прописали логин и пароль и зарегистрировались по oauth, то вы можете поставить новый из двух вариантов или все.</h4>
+      <h4>Если вы зарегистрировались только по oauth, то тогда надо вводить логин и пароль, если вы ходите в вашем аккаунте поставить</h4>
 
       <form onSubmit={(e) => e.preventDefault()}>
-        <h3>Введите логин:</h3>
+        <h3>Введите новый логин:</h3>
         <input
           type="text"
           value={login}
           onChange={(e) => setLogin(e.target.value)}
           placeholder="Ваш логин"
+          disabled={isLoading}
+        />
+        <p>или</p>
+        <h3>Введите новый пароль:</h3>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Ваш пароль"
           disabled={isLoading}
         />
 
@@ -97,7 +110,7 @@ export default function ResetPass() {
         </div>
       </form>
     </div>
-  );
+  );*/
 }
 /* 
 <input type="submit" value="Отправить" />

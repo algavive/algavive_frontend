@@ -41,10 +41,10 @@ export default function User(){
 					<div className="MPRS-Name">
 						GamerDev12672
 						<img src={Celebrity} style={{height: '24px'}}/>
-						<div style={{color: 'purple'}}>Sigma</div>
+						<div style={{color: 'purple'}}>Sigma</div> {/*UserProfile.rankTitle?*/}
 				</div>
 					<div className="MPRS-Desc">
-						<Linkify>{testdesc}</Linkify>
+						<Linkify>{testdesc}</Linkify> {/*UserProfile.description?*/}
 					</div>
 				</div>
 			</div>

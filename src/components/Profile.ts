@@ -21,6 +21,7 @@ export async function loadUser() {
         user = {
           logined: true,
           name: data.user.username || data.user.login || "",
+          hasGoogle: data.user.hasGoogle,
           admin: data.user.admin || false,
           avatarUrl: data.user.avatarUrl || null,
           description: data.user.description || null

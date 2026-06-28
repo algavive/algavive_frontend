@@ -2,7 +2,6 @@ import { useState, useRef, FormEvent } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import * as config from '../config';
-import { Link } from 'react-router-dom';
 import { useGoogleAuth } from '../components/GoogleAuth';
 
 export default function Login() {
@@ -18,14 +17,6 @@ export default function Login() {
       try {
         if (loginMode !== 'google') {
           setError('Выберите "Вход с Google"');
-          return;
-        }
-
-        const formData = new FormData(formRef.current!);
-        const login = formData.get('login') as string;
-
-        if (!login) {
-          setError('Введите логин');
           return;
         }
 
@@ -144,7 +135,6 @@ export default function Login() {
             />
             Обычный вход
           </label>
-
           <label>
             <input
               type="radio"
@@ -156,11 +146,10 @@ export default function Login() {
           </label>
         </div>
 
-        <h3>Введите логин:</h3>
-        <input type="text" name="login" required disabled={isLoading} />
-
         {loginMode === 'local' && (
           <>
+            <h3>Введите логин:</h3>
+            <input type="text" name="login" required disabled={isLoading} />
             <h3>Введите пароль:</h3>
             <input type="password" name="pass" required disabled={isLoading} />
           </>
@@ -203,17 +192,21 @@ export default function Login() {
           </div>
         )}
       </form>
+    </div>
+  );
+}
 
-      <div className="oauth-divider">
+/*
+Это тоже не имеет смысла при демо релизе, так как будет производственный ад с ним
+
+<div className="oauth-divider">
         <span>или</span>
       </div>
 
       <h1>Восстановление пароля</h1>
       <h3>Работает у аккаунтов с google oauth</h3>
       <Link to="/resetpass">Забыли пароль?</Link>
-    </div>
-  );
-}
+*/
 
 /*
 <h1>Восстановление пароля</h1>

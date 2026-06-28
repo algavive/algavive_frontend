@@ -20,15 +20,6 @@ export default function Register() {
           return;
         }
 
-        const formData = new FormData(formRef.current!);
-        const login = formData.get('login') as string;
-        const pass = formData.get('pass') as string;
-
-        if (!login || !pass) {
-          setError('Введите логин и пароль');
-          return;
-        }
-
         const turnstileToken = turnstileRef.current?.getResponse();
         if (!turnstileToken) {
           setError('Пожалуйста, подтвердите, что вы не робот');
@@ -42,8 +33,7 @@ export default function Register() {
           body: JSON.stringify({
             googleToken: userData.token,
             turnstileToken: turnstileToken,
-            mode: 'register',
-            login: login
+            mode: 'register'
           }),
         });
 
@@ -145,7 +135,6 @@ export default function Register() {
             />
             Обычная регистрация
           </label>
-
           <label>
             <input
               type="radio"
@@ -153,15 +142,18 @@ export default function Register() {
               checked={registrationMode === 'google'}
               onChange={() => setRegistrationMode('google')}
             />
-            Связать с Google аккаунтом
+            Зарегистрироваться через Google аккаунт
           </label>
         </div>
 
-        <h3>Введите логин:</h3>
-        <input type="text" name="login" required disabled={isLoading} />
-
-        <h3>Введите пароль:</h3>
-        <input type="password" name="pass" required disabled={isLoading} />
+        {registrationMode === 'local' && (
+          <>
+            <h3>Введите логин:</h3>
+            <input type="text" name="login" required disabled={isLoading} />
+            <h3>Введите пароль:</h3>
+            <input type="password" name="pass" required disabled={isLoading} />
+          </>
+        )}
 
         <Turnstile
           ref={turnstileRef}
