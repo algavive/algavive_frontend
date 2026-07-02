@@ -1,6 +1,17 @@
 import * as config from '../config'
 import {UserClient} from '../types'
 
+export interface UserClient {
+  logined: boolean
+  name: string
+  admin?: number
+  hasGoogle?: boolean
+  avatarUrl: string | null
+  description?: string | null
+  userIcon?: string
+  userTitle?: string
+}
+
 let user: UserClient = {
   logined: false,
   name: "",

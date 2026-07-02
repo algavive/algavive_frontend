@@ -31,19 +31,28 @@ export default function MyProfile() {
   const handleSaveDescription = () => {
     const newDesc = tempDescription.slice(0, 1024).replace(/\n/g, ' ')
     user.description = newDesc
+    const response = fetch(`${config.BACKEND_URL}/api/change/description`, {
+          method: 'POST',
+          credentials: 'include',
+          body: JSON.stringify({
+            description: newDesc
+          })
+        })
     setDescription(newDesc)
     setIsEditingDesc(false)
   }
 
-  const handleCancelDescription = () => {
-    setTempDescription(description)
-    setIsEditingDesc(false)
-  }
-
-  const handleImageUrlSubmit = () => {
+  const handleImageUrlSubmit = async() => {
     if (urlInput.trim()) {
       setProfileImage(urlInput.trim())
       user.avatarUrl = urlInput.trim()
+      const response = await fetch(`${config.BACKEND_URL}/api/change/avatarUrl`, {
+          method: 'POST',
+          credentials: 'include',
+          body: JSON.stringify({
+            avatarUrl: urlInput.trim()
+          })
+        })
       setUrlInput('')
       setIsEditingImage(false)
     }
@@ -129,19 +138,14 @@ export default function MyProfile() {
                 <div className="MPRS-button-text">Изменить описание</div>
               </button>
             ) : (
-              <>
-                <button onClick={handleSaveDescription} style={{ marginRight: '10px' }}>
-                  <div className="MPRS-button-text">Сохранить</div>
-                </button>
-                <button onClick={handleCancelDescription}>
-                  <div className="MPRS-button-text">Отмена</div>
-                </button>
-              </>
+              <button onClick={handleSaveDescription} style={{ marginRight: '10px' }}>
+                <div className="MPRS-button-text">Сохранить</div>
+              </button>
             )}
           </div>
           <div className="MPRS-Desc">
             {!isEditingDesc ? (
-              <Linkify>{description}</Linkify>
+              <Linkify>{user.description}</Linkify>
             ) : (
               <textarea
                 value={tempDescription}

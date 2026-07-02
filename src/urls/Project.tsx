@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom'
-import { useState, ChangeEvent } from 'react'
+import { useState, ChangeEvent, useEffect } from 'react'
 import * as config from '../config'
 import Linkify from 'linkify-react'
 import { PageProject, Comments, Reply } from '../types'
@@ -15,87 +15,137 @@ export default function Project() {
   const [isFullscreenMedia, setIsFullscreenMedia] = useState(false)
   const [fullscreenMediaIndex, setFullscreenMediaIndex] = useState(0)
   const [urlInput, setUrlInput] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   const [projectData, setProjectData] = useState<PageProject>({
     id: Number(id) || 0,
-    title: 'Мэднесс комбат',
-    type: 'Пост',
-    author: 'GamerDev12672',
-    authorId: 8273983,
-    views: 20,
-    likes: 37,
+    title: '',
+    type: '',
+    author: '',
+    authorId: 0,
+    views: 0,
+    likes: 0,
     isLiked: false,
-    comments: 5,
-    description: `Добро пожаловать в мэднесс комбат!\n\nЕсли хотите поиграть то переходите по ссылке https://madness.com`,
+    comments: 0,
+    description: '',
     imageUrl: `${config.STATIC_LOCATION}/cover.png`,
     content: '',
-    isOwner: true
+    isOwner: false
   })
 
-  const [editData, setEditData] = useState({
-    title: projectData.title,
-    description: projectData.description,
-    imageUrl: projectData.imageUrl,
-    content: projectData.content
+  const [editData, setEditData] = useState<{
+    title: string
+    description: string
+    imageUrl: string
+    content: string | string[]
+  }>({
+    title: '',
+    description: '',
+    imageUrl: '',
+    content: ''
   })
 
-  const [commentsData, setCommentsData] = useState<CommentType[]>([
-    {
-      id: 1,
-      author: 'GamerDev12672',
-      authorId: 8273983,
-      text: 'Отличная игра! Всем рекомендую 🔥',
-      date: '2024-01-15',
-      rankTitle: 'Sigma',
-      rankIcon: `${config.STATIC_LOCATION}/seleba.png`,
-      replies: [
-        {
-          id: 2,
-          author: 'ProGamer',
-          authorId: 5555555,
-          text: 'Согласен, лучшая игра в этом году!',
-          date: '2024-01-15',
-          rankTitle: 'Sigma',
-      rankIcon: `${config.STATIC_LOCATION}/seleba.png`
-        },
-        {
-          id: 4,
-          author: 'NoobMaster',
-          authorId: 7777777,
-          text: 'Полностью поддерживаю!',
-          date: '2024-01-16'
-        }
-      ]
-    },
-    {
-      id: 3,
-      author: 'CoolPlayer',
-      authorId: 1234567,
-      text: 'Когда будет обновление?',
-      date: '2024-01-16',
-      replies: [
-        {
-          id: 5,
-          author: 'GamerDev12672',
-          authorId: 8273983,
-          text: 'На следующей неделе!',
-          date: '2024-01-17'
-        }
-      ]
-    }
-  ])
-
+  const [commentsData, setCommentsData] = useState<CommentType[]>([])
   const [mainInput, setMainInput] = useState('')
   const [replyInputs, setReplyInputs] = useState<Record<number, string>>({})
   const [showReplyForms, setShowReplyForms] = useState<Record<number, boolean>>({})
-  const [collapsedReplies, setCollapsedReplies] = useState<Record<number, boolean>>({ 1: true, 3: true })
+  const [collapsedReplies, setCollapsedReplies] = useState<Record<number, boolean>>({})
 
-  const toggleProjectLike = () => {
-    setProjectData({
-      ...projectData,
-      isLiked: !projectData.isLiked,
-      likes: projectData.isLiked ? projectData.likes - 1 : projectData.likes + 1
-    })
+  useEffect(() => {
+    if (!id) return
+    fetchProject()
+    fetchComments()
+  }, [id])
+
+  const fetchProject = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${id}`, {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setProjectData({
+          id: data.project.id,
+          title: data.project.title,
+          type: data.project.type,
+          author: data.project.author || 'Неизвестно',
+          authorId: data.project.user_id,
+          views: data.project.views || 0,
+          likes: data.project.likes || 0,
+          isLiked: data.project.isLiked || false,
+          comments: data.project.comments || 0,
+          description: data.project.description || '',
+          imageUrl: data.project.imageUrl || `${config.STATIC_LOCATION}/cover.png`,
+          content: data.project.content || '',
+          isOwner: data.project.isOwner || false,
+          authorProfile: data.project.authorProfile || null
+        })
+        setEditData({
+          title: data.project.title,
+          description: data.project.content || '',
+          imageUrl: data.project.imageUrl || '',
+          content: data.project.content || ''
+        })
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки проекта', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${id}/comments`, {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (response.ok) {
+        const comments: CommentType[] = (data.comments || []).map((c: any) => ({
+          id: c.id,
+          author: c.author,
+          authorId: c.user_id,
+          content: c.content,
+          date: c.created_at,
+          rankIcon: c.rankIcon || null,
+          rankTitle: c.rankTitle || null,
+          authorProfile: c.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
+          replies: (c.replies || []).map((r: any) => ({
+            id: r.id,
+            author: r.author,
+            authorId: r.user_id,
+            content: r.content,
+            date: r.created_at,
+            rankIcon: r.rankIcon || null,
+            rankTitle: r.rankTitle || null,
+            authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
+          }))
+        }))
+        setCommentsData(comments)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки комментариев', error)
+    }
+  }
+
+  const toggleProjectLike = async () => {
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/like`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setProjectData(prev => ({
+          ...prev,
+          isLiked: data.liked,
+          likes: data.liked ? prev.likes + 1 : prev.likes - 1
+        }))
+      }
+    } catch (error) {
+      console.error('Ошибка лайка', error)
+    }
   }
 
   const toggleReplies = (commentId: number) => {
@@ -105,7 +155,7 @@ export default function Project() {
     })
   }
 
-  const deleteComment = (commentId: number) => {
+  const deleteComment = async (commentId: number) => {
     const comment = commentsData.find(c => c.id === commentId)
     if (!comment) return
 
@@ -113,57 +163,87 @@ export default function Project() {
       alert('Вы можете удалять только свои комментарии')
       return
     }
-    if (confirm('Удалить комментарий?')) {
-      setCommentsData(prev => prev.filter(c => c.id !== commentId))
+    if (!confirm('Удалить комментарий?')) return
+
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/comments/${commentId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      if (response.ok) {
+        setCommentsData(prev => prev.filter(c => c.id !== commentId))
+      }
+    } catch (error) {
+      console.error('Ошибка удаления комментария', error)
     }
   }
 
-  const deleteReply = (commentId: number, replyId: number) => {
+  const deleteReply = async (commentId: number, replyId: number) => {
     const comment = commentsData.find(c => c.id === commentId)
     if (!comment) return
-    const reply = comment.replies.find(r => r.id === replyId)
+    const replies = comment.replies || []
+    const reply = replies.find(r => r.id === replyId)
     if (!reply) return
 
     if (!user.admin && user.name !== reply.author) {
       alert('Вы можете удалять только свои ответы')
       return
     }
-    if (confirm('Удалить ответ?')) {
-      setCommentsData(prev =>
-        prev.map(c => {
-          if (c.id === commentId) {
-            return { ...c, replies: c.replies.filter(r => r.id !== replyId) }
-          }
-          return c
-        })
-      )
+    if (!confirm('Удалить ответ?')) return
+
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/comments/${replyId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      if (response.ok) {
+        setCommentsData(prev =>
+          prev.map(c => {
+            if (c.id === commentId) {
+              return { ...c, replies: (c.replies || []).filter(r => r.id !== replyId) }
+            }
+            return c
+          })
+        )
+      }
+    } catch (error) {
+      console.error('Ошибка удаления ответа', error)
     }
   }
 
-  const removeProject = () => {
-    if (!user.admin) {
-      alert('Только администратор может снять проект с публикации')
+  const addMainComment = async () => {
+    if (mainInput.trim() === '') return
+    if (!user.logined) {
+      alert('Вы не зашли в аккаунт')
       return
     }
-    if (confirm('Снять проект с публикации?')) {
-      alert('Проект снят с публикации')
-    }
-  }
 
-  const addMainComment = () => {
-    if (mainInput.trim() === '') return
-    if(!user.logined) alert("Вы не зашли в аккаунт"); return
-    const newComment: CommentType = {
-      id: Date.now(),
-      author: user.name,
-      authorId: 9999999,
-      text: mainInput,
-      date: new Date().toISOString().split('T')[0],
-      replies: []
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ content: mainInput })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        const newComment: CommentType = {
+          id: data.comment.id,
+          author: data.comment.author,
+          authorId: data.comment.user_id,
+          content: data.comment.content,
+          date: data.comment.created_at,
+          rankIcon: data.comment.rankIcon || null,
+          rankTitle: data.comment.rankTitle || null,
+          authorProfile: data.comment.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
+          replies: []
+        }
+        setCommentsData(prev => [newComment, ...prev])
+        setMainInput('')
+      }
+    } catch (error) {
+      console.error('Ошибка отправки комментария', error)
     }
-
-    setCommentsData([newComment, ...commentsData])
-    setMainInput('')
   }
 
   const showReplyForm = (commentId: number) => {
@@ -177,34 +257,49 @@ export default function Project() {
     })
   }
 
-  const addReply = (parentId: number) => {
+  const addReply = async (parentId: number) => {
     const replyText = replyInputs[parentId]
     if (!replyText || replyText.trim() === '') return
-
-    const newReply: Reply = {
-      id: Date.now(),
-      author: user.name,
-      authorId: 9999999,
-      text: replyText,
-      date: new Date().toISOString().split('T')[0]
+    if (!user.logined) {
+      alert('Вы не зашли в аккаунт')
+      return
     }
 
-    const updatedComments = commentsData.map(comment => {
-      if (comment.id === parentId) {
-        return {
-          ...comment,
-          replies: [newReply, ...comment.replies]
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/comments/${parentId}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ content: replyText })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setCommentsData(prev =>
+          prev.map(c => {
+            if (c.id === parentId) {
+              const newReply: Reply = {
+                id: data.reply.id,
+                author: data.reply.author,
+                authorId: data.reply.user_id,
+                content: data.reply.content,
+                date: data.reply.created_at,
+                rankIcon: data.reply.rankIcon || null,
+                rankTitle: data.reply.rankTitle || null,
+                authorProfile: data.reply.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
+              }
+              return { ...c, replies: [...(c.replies || []), newReply] }
+            }
+            return c
+          })
+        )
+        setReplyInputs({ ...replyInputs, [parentId]: '' })
+        setShowReplyForms({ ...showReplyForms, [parentId]: false })
+        if (collapsedReplies[parentId]) {
+          setCollapsedReplies({ ...collapsedReplies, [parentId]: false })
         }
       }
-      return comment
-    })
-
-    setCommentsData(updatedComments)
-    setReplyInputs({ ...replyInputs, [parentId]: '' })
-    setShowReplyForms({ ...showReplyForms, [parentId]: false })
-
-    if (collapsedReplies[parentId]) {
-      setCollapsedReplies({ ...collapsedReplies, [parentId]: false })
+    } catch (error) {
+      console.error('Ошибка отправки ответа', error)
     }
   }
 
@@ -213,7 +308,7 @@ export default function Project() {
     setEditData({
       title: projectData.title,
       description: projectData.description,
-      imageUrl: projectData.imageUrl,
+      imageUrl: projectData.imageUrl || '',
       content: projectData.content
     })
     setUrlInput('')
@@ -229,7 +324,6 @@ export default function Project() {
 
   const handleUrlImport = (type: 'imageUrl' | 'content' | 'media') => {
     if (!urlInput.trim()) return
-
     const url = urlInput.trim()
     const extension = url.split('.').pop()?.toLowerCase() || ''
 
@@ -263,20 +357,37 @@ export default function Project() {
         }))
         setUrlInput('')
       } else {
-        alert('Неверный формат медиа файла. Поддерживаются: png, jpg, gif, webp, svg, bmp, ico, tiff')
+        alert('Неверный формат медиа файла')
       }
     }
   }
 
-  const handleSaveEdit = () => {
-    setProjectData(prev => ({
-      ...prev,
-      title: editData.title,
-      description: editData.description,
-      imageUrl: editData.imageUrl,
-      content: editData.content
-    }))
-    setIsEditing(false)
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: editData.title,
+          description: typeof editData.description === 'string' ? editData.description : '',
+          content: editData.content,
+          imageUrl: editData.imageUrl
+        })
+      })
+      if (response.ok) {
+        setProjectData(prev => ({
+          ...prev,
+          title: editData.title,
+          description: typeof editData.description === 'string' ? editData.description : '',
+          imageUrl: editData.imageUrl,
+          content: Array.isArray(editData.content) ? JSON.stringify(editData.content) : editData.content,
+        }))
+        setIsEditing(false)
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения', error)
+    }
   }
 
   const openFullscreen = () => {
@@ -293,22 +404,73 @@ export default function Project() {
     setIsFullscreenMedia(false)
   }
 
-  const deleteProject = () => {
+  const deleteProject = async () => {
     if (!user.admin && !projectData.isOwner) {
       alert('У вас нет прав на удаление этого проекта')
       return
     }
-    if (confirm('Удалить проект?')) {
-      alert('Проект удален')
+    if (!confirm('Удалить проект?')) return
+
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      if (response.ok) {
+        alert('Проект удален')
+        window.location.href = '/my-projects'
+      }
+    } catch (error) {
+      console.error('Ошибка удаления', error)
     }
   }
 
-  const handlePublish = () => {
-    alert('Проект опубликован в Зал Славы')
+  const handlePublish = async () => {
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/publish`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      if (response.ok) {
+        alert('Проект опубликован в Зал Славы')
+      }
+    } catch (error) {
+      console.error('Ошибка публикации', error)
+    }
   }
 
-  const handlePublishEntertaiment = () => {
-    alert('Проект опубликован в Центр Развлечений')
+  const handlePublishEntertaiment = async () => {
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/publish-entertaiment`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      if (response.ok) {
+        alert('Проект опубликован в Центр Развлечений')
+      }
+    } catch (error) {
+      console.error('Ошибка публикации', error)
+    }
+  }
+
+  const removeProject = async () => {
+    if (!user.admin) {
+      alert('Только администратор может снять проект с публикации')
+      return
+    }
+    if (!confirm('Снять проект с публикации?')) return
+
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/unpublish`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      if (response.ok) {
+        alert('Проект снят с публикации')
+      }
+    } catch (error) {
+      console.error('Ошибка снятия с публикации', error)
+    }
   }
 
   const renderCardContent = () => {
@@ -316,7 +478,6 @@ export default function Project() {
       case 'Пост': {
         const mediaArray = Array.isArray(projectData.content) ? projectData.content : []
         const displayImage = mediaArray.length > 0 ? mediaArray[0] : projectData.imageUrl
-
         return (
           <div style={{ width: '100%', height: '100%', position: 'relative' }}>
             <img
@@ -491,6 +652,10 @@ export default function Project() {
     }
   }
 
+  if (isLoading) {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Загрузка...</div>
+  }
+
   return (
     <>
       <div className="PageProject">
@@ -507,7 +672,7 @@ export default function Project() {
           <div className="PCI-profile">
             <Link to={`/user?id=${projectData.authorId}`}>
               <img
-                src={`${config.STATIC_LOCATION}/emptyprofile.png`}
+                src={projectData.authorProfile ? projectData.authorProfile :`${config.STATIC_LOCATION}/emptyprofile.png`}
                 alt="profile"
                 className="JustProfile"
                 style={{ borderRadius: '36px' }}
@@ -617,7 +782,7 @@ export default function Project() {
 
               {projectData.type === 'Пост' && (
                 <div className="form-group">
-                  <label>Медиа файлы (до 10 шт) - PNG, JPG, GIF, WEBP</label>
+                  <label>Медиа файлы (до 10 шт)</label>
                   <div className="url-import-section">
                     <input
                       type="text"
@@ -735,7 +900,7 @@ export default function Project() {
                 Сохранить
               </button>
               <button className="btn-publish" onClick={handlePublish}>
-                Опубликовать/Снять с публикации
+                Опубликовать
               </button>
             </div>
             {user.admin && (
@@ -782,146 +947,156 @@ export default function Project() {
           </div>
 
           <div className="commentsList">
-            {commentsData.map(comment => (
-              <div key={comment.id} className="commentItem">
-                <div className="commentHeader">
-                  <Link to={`/user?id=${comment.authorId}`} className="commentAuthor">
-                    <img
-                      src={`${config.STATIC_LOCATION}/emptyprofile.png`}
-                      alt="profile"
-                      className="commentAvatar"
-                      style={{ borderRadius: '50%' }}
-                    />
-                    <div className="commentAuthorInfo">
-                      <div className="commentAuthorNameWrapper">
-                        <span className="commentAuthorName">{comment.author}</span>
-                        {comment.rankIcon && (
-                          <img
-                            src={comment.rankIcon}
-                            alt="rank"
-                            style={{ height: '16px', width: '16px', marginLeft: '4px' }}
-                          />
-                        )}
-                      </div>
-                      {comment.rankTitle && (
-                        <span className="commentRankTitle" style={{ color: 'purple', fontSize: '11px' }}>
-                          {comment.rankTitle}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="commentDate">{comment.date}</span>
-                    {(user.admin || user.name === comment.author) && (
-                      <button
-                        onClick={() => deleteComment(comment.id)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: 'red',
-                          cursor: 'pointer',
-                          fontSize: '16px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="commentText">{comment.text}</div>
-
-                <div className="commentFooter">
-                  <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>
-                    Ответить
-                  </button>
-                  {comment.replies.length > 0 && (
-                    <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
-                      {collapsedReplies[comment.id]
-                        ? `Показать ответы (${comment.replies.length})`
-                        : `Скрыть ответы (${comment.replies.length})`}
-                    </button>
-                  )}
-                </div>
-
-                {showReplyForms[comment.id] && (
-                  <div className="replyForm">
-                    <input
-                      type="text"
-                      placeholder="Написать ответ..."
-                      value={replyInputs[comment.id] || ''}
-                      onChange={e =>
-                        setReplyInputs({
-                          ...replyInputs,
-                          [comment.id]: e.target.value
-                        })
-                      }
-                      onKeyDown={e => e.key === 'Enter' && addReply(comment.id)}
-                    />
-                    <button onClick={() => addReply(comment.id)}>Отправить</button>
-                    <button className="cancelReplyBtn" onClick={() => showReplyForm(comment.id)}>
-                      Отмена
-                    </button>
-                  </div>
-                )}
-
-                {comment.replies.length > 0 && !collapsedReplies[comment.id] && (
-                  <div className="childComments">
-                    {comment.replies.map((reply: Reply) => (
-                      <div key={reply.id} className="childComment">
-                        <div className="commentHeader">
-                          <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
-                            <img
-                              src={`${config.STATIC_LOCATION}/emptyprofile.png`}
-                              alt="profile"
-                              className="commentAvatar"
-                              style={{ borderRadius: '50%' }}
-                            />
-                            <div className="commentAuthorInfo">
-                              <div className="commentAuthorNameWrapper">
-                                <span className="commentAuthorName">{reply.author}</span>
-                                {reply.rankIcon && (
-                                  <img
-                                    src={reply.rankIcon}
-                                    alt="rank"
-                                    style={{ height: '16px', width: '16px', marginLeft: '4px' }}
-                                  />
-                                )}
-                              </div>
-                              {reply.rankTitle && (
-                                <span className="commentRankTitle" style={{ color: 'purple', fontSize: '13px' }}>
-                                  {reply.rankTitle}
-                                </span>
-                              )}
-                            </div>
-                          </Link>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span className="commentDate">{reply.date}</span>
-                            {(user.admin || user.name === reply.author) && (
-                              <button
-                                onClick={() => deleteReply(comment.id, reply.id)}
-                                style={{
-                                  background: 'none',
-                                  border: 'none',
-                                  color: 'red',
-                                  cursor: 'pointer',
-                                  fontSize: '16px',
-                                  fontWeight: 'bold'
-                                }}
-                              >
-                                ✕
-                              </button>
+            {commentsData.length === 0 ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
+                Комментариев пока нет. Будьте первым!
+              </div>
+            ) : (
+              commentsData.map(comment => {
+                const replies = comment.replies || []
+                const hasReplies = replies.length > 0
+                return (
+                  <div key={comment.id} className="commentItem">
+                    <div className="commentHeader">
+                      <Link to={`/user?id=${comment.authorId}`} className="commentAuthor">
+                        <img
+                          src={comment.authorProfile}
+                          alt="profile"
+                          className="commentAvatar"
+                          style={{ borderRadius: '50%' }}
+                        />
+                        <div className="commentAuthorInfo">
+                          <div className="commentAuthorNameWrapper">
+                            <span className="commentAuthorName">{comment.author}</span>
+                            {comment.rankIcon && (
+                              <img
+                                src={comment.rankIcon}
+                                alt="rank"
+                                style={{ height: '16px', width: '16px', marginLeft: '4px' }}
+                              />
                             )}
                           </div>
+                          {comment.rankTitle && (
+                            <span className="commentRankTitle" style={{ color: 'purple', fontSize: '11px' }}>
+                              {comment.rankTitle}
+                            </span>
+                          )}
                         </div>
-                        <div className="commentText">{reply.text}</div>
+                      </Link>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className="commentDate">{new Date(comment.date + 'Z').toLocaleString()}</span>
+                        {(user.admin || user.name === comment.author) && (
+                          <button
+                            onClick={() => deleteComment(comment.id)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'red',
+                              cursor: 'pointer',
+                              fontSize: '16px',
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            ✕
+                          </button>
+                        )}
                       </div>
-                    ))}
+                    </div>
+
+                    <div className="commentText">{comment.content}</div>
+
+                    <div className="commentFooter">
+                      <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>
+                        Ответить
+                      </button>
+                      {hasReplies && (
+                        <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
+                          {collapsedReplies[comment.id]
+                            ? `Показать ответы (${replies.length})`
+                            : `Скрыть ответы (${replies.length})`}
+                        </button>
+                      )}
+                    </div>
+
+                    {showReplyForms[comment.id] && (
+                      <div className="replyForm">
+                        <input
+                          type="text"
+                          placeholder="Написать ответ..."
+                          value={replyInputs[comment.id] || ''}
+                          onChange={e =>
+                            setReplyInputs({
+                              ...replyInputs,
+                              [comment.id]: e.target.value
+                            })
+                          }
+                          onKeyDown={e => e.key === 'Enter' && addReply(comment.id)}
+                        />
+                        <button onClick={() => addReply(comment.id)}>Отправить</button>
+                        <button className="cancelReplyBtn" onClick={() => showReplyForm(comment.id)}>
+                          Отмена
+                        </button>
+                      </div>
+                    )}
+
+                    {hasReplies && !collapsedReplies[comment.id] && (
+                      <div className="childComments">
+                        {replies.map((reply: Reply) => (
+                          <div key={reply.id} className="childComment">
+                            <div className="commentHeader">
+                              <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
+                                <img
+                                  src={reply.authorProfile}
+                                  alt="profile"
+                                  className="commentAvatar"
+                                  style={{ borderRadius: '50%' }}
+                                />
+                                <div className="commentAuthorInfo">
+                                  <div className="commentAuthorNameWrapper">
+                                    <span className="commentAuthorName">{reply.author}</span>
+                                    {reply.rankIcon && (
+                                      <img
+                                        src={reply.rankIcon}
+                                        alt="rank"
+                                        style={{ height: '16px', width: '16px', marginLeft: '4px' }}
+                                      />
+                                    )}
+                                  </div>
+                                  {reply.rankTitle && (
+                                    <span className="commentRankTitle" style={{ color: 'purple', fontSize: '13px' }}>
+                                      {reply.rankTitle}
+                                    </span>
+                                  )}
+                                </div>
+                              </Link>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span className="commentDate">{new Date(reply.date + 'Z').toLocaleString()}</span>
+                                {(user.admin || user.name === reply.author) && (
+                                  <button
+                                    onClick={() => deleteReply(comment.id, reply.id)}
+                                    style={{
+                                      background: 'none',
+                                      border: 'none',
+                                      color: 'red',
+                                      cursor: 'pointer',
+                                      fontSize: '16px',
+                                      fontWeight: 'bold'
+                                    }}
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <div className="commentText">{reply.content}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                )
+              })
+            )}
           </div>
         </div>
       </div>

@@ -12,7 +12,7 @@ const Trends = () => {
       id: 1,
       title: 'крутой шутан',
       author: 'Something',
-      type: 'Скретч',
+      type: 'Scratch',
       imageUrl: null,
       likes: 25,
       comments: 5,

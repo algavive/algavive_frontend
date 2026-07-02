@@ -1,14 +1,5 @@
 import * as config from './config'
 
-export interface UserClient {
-  logined: boolean
-  name: string
-  admin: boolean
-  avatarUrl: string | null
-  description?: string | null
-  userIcon?: string
-  userTitle?: string
-}
 
 export interface Project {
   id: number
@@ -29,6 +20,7 @@ export interface PageProject {
   title: string
   author: string
   authorId: number
+  authorProfile?: null | string
 
   isLiked: boolean
   isOwner: boolean
@@ -64,21 +56,33 @@ export interface Reply {
   id: number,
   author: string,
   authorId: number,
-  text: string,
+  content: string,
   date: string,
   rankIcon?: string,
-  rankTitle?: string
+  rankTitle?: string,
+  authorProfile: string
 }
 
 export interface Comments {
   id: number,
   author: string,
   authorId: number,
-  text: string,
+  content: string,
   date: string,
   rankIcon?: string,
   rankTitle?: string,
+  authorProfile: string,
   replies: Reply[]
+}
+
+export interface Notifications {
+  id: number,
+  type: string,
+  user: string,
+  action: string,
+  target: string,
+  time: string,
+  redirectUrl: string
 }
 
 export const Celebrity: string = `${config.STATIC_LOCATION}/seleba.png`

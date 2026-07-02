@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
+import Notifications from '../types'
 
-const notifications = [
+const notifications: Notifications = [
   { id: 1, type: 'like', user: 'Анна', action: 'лайкнула ваш проект', target: 'Эмулятор NES', time: '5 мин назад', redirectUrl: '#' },
   { id: 2, type: 'comment', user: 'Дмитрий', action: 'прокомментировал', target: '3D движок', time: 'час назад', redirectUrl: '#' },
   { id: 3, type: 'reply', user: 'Максим', action: 'ответил на комментарий', target: 'в проекте Эмулятор', time: 'вчера', redirectUrl: '#' },
