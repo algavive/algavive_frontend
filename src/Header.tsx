@@ -18,7 +18,7 @@ const Header = () => {
         </Link>
         <div className="h-buttons">
           <Link to="/hall-of-fame">Зал Славы</Link>
-          <Link to="/my-projects">Мои проекты</Link>
+          {user.logined && (<Link to="/my-projects">Мои проекты</Link>)}
           <Link to="/entertainment">Центр Развлечений</Link>
           {user.logined && (<Link to="/settings">Настройки</Link>)}
         </div>
@@ -26,7 +26,7 @@ const Header = () => {
 
       <div className="h-left-menu">
         <SearchButton />
-        <NotificationButton />
+        {user.logined && <NotificationButton />}
         <ProfileHeader />
       </div>
     </div>

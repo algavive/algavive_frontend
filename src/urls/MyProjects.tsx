@@ -124,8 +124,7 @@ export default function MyProjects() {
         body: JSON.stringify({
           title: newProject.title,
           type: newProject.type,
-          imageUrl: newProject.imageUrl || null,
-          content: newProject.content || null
+          imageUrl: newProject.imageUrl || null
         })
       })
 
@@ -300,7 +299,7 @@ export default function MyProjects() {
                 </select>
               </div>
 
-              {newProject.type !== 'Пост' && (
+              {/*{newProject.type !== 'Пост' && (
                 <div className="form-group">
                   <label htmlFor="content">
                     {newProject.type === 'Scratch' && 'Ссылка на .sb3 файл'}
@@ -315,7 +314,7 @@ export default function MyProjects() {
                     onChange={handleInputChange}
                   />
                 </div>
-              )}
+              )}*/}
 
               <div className="form-group">
                 <label htmlFor="imageUrl">Ссылка на изображение (опционально)</label>

@@ -9,11 +9,11 @@ export default function Entry() {
   return (
     <div className="Entry">
       <h1>Ты кто?</h1>
-      <Link to="/register">
-        <img src={`${config.STATIC_LOCATION}/IAmNew.png`} alt="Новый пользователь" />
-      </Link>
       <Link to="/login">
         <img src={`${config.STATIC_LOCATION}/IAmAlgavivec.png`} alt="Уже есть аккаунт" />
+      </Link>
+      <Link to="/register">
+        <img src={`${config.STATIC_LOCATION}/IAmNew.png`} alt="Новый пользователь" />
       </Link>
     </div>
   );

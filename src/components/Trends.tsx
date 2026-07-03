@@ -1,44 +1,50 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import ProjectCard from '../components/ProjectCard'
 import type { Project, TrendPeriod } from '../types'
 import * as config from '../config'
 
 const Trends = () => {
   const [activeTrend, setActiveTrend] = useState<TrendPeriod>('day')
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-//Там api просто допишу
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: 'крутой шутан',
-      author: 'Something',
-      type: 'Scratch',
-      imageUrl: null,
-      likes: 25,
-      comments: 5,
-      views: 20
-    },
-    {
-      id: 3,
-      title: 'Мэднес комбат',
-      author: 'GamerDev12672',
-      type: 'Пост',
-      imageUrl: null,
-      likes: 37,
-      comments: 5,
-      views: 20
-    },
-    {
-      id: 4,
-      title: 'Когда я выучу реакт и хоноо',
-      author: 'CoderPro',
-      type: 'Видео',
-      imageUrl: null,
-      likes: 52,
-      comments: 15,
-      views: 20
+
+  useEffect(() => {
+    fetchTrends(activeTrend)
+  }, [activeTrend])
+
+  const fetchTrends = async (period: TrendPeriod) => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/trends?period=${period}`, {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (response.ok) {
+        const mapped = data.projects.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          author: p.author,
+          type: p.type,
+          imageUrl: p.imageUrl,
+          likes: p.likes || 0,
+          comments: p.comments || 0,
+          views: p.views || 0,
+          authorIcon: p.authorIcon,
+          authorTitle: p.authorTitle,
+          authorProfile: p.authorProfile,
+        }))
+        setProjects(mapped)
+      } else {
+        setProjects([])
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки трендов', error)
+      setProjects([])
+    } finally {
+      setIsLoading(false)
     }
-  ]
+  }
 
   const handleTrendChange = (trend: TrendPeriod) => {
     setActiveTrend(trend)
@@ -81,10 +87,15 @@ const Trends = () => {
           </button>
         </div>
       </div>
-      <div className="trends-projects">
+      <div className="trends-projects" ref={scrollRef}>
+        {isLoading && <div style={{ padding: '20px' }}>Загрузка...</div>}
+        {!isLoading && projects.length === 0 && (
+          <div style={{ padding: '20px', color: '#666' }}>Нет проектов в трендах</div>
+        )}
         {projects.map(project => (
           <ProjectCard key={project.id} project={project} />
         ))}
+        {!projects && <h1>Пока нету проектов в трендах</h1>}
       </div>
     </>
   )

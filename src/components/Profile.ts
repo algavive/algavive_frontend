@@ -2,6 +2,7 @@ import * as config from '../config'
 import {UserClient} from '../types'
 
 export interface UserClient {
+  id: number
   logined: boolean
   name: string
   admin?: number
@@ -13,6 +14,7 @@ export interface UserClient {
 }
 
 let user: UserClient = {
+  id: -1,
   logined: false,
   name: "",
   admin: false,
@@ -30,6 +32,7 @@ export async function loadUser() {
       const data = await res.json()
       if (data.user) {
         user = {
+          id: data.user.id,
           logined: true,
           name: data.user.username || data.user.login || "",
           hasGoogle: data.user.hasGoogle,

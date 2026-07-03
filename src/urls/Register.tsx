@@ -8,7 +8,7 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [registrationMode, setRegistrationMode] = useState<'local' | 'google'>('local');
+  const [registrationMode, setRegistrationMode] = useState<'local' | 'google'>('google');
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -133,8 +133,9 @@ export default function Register() {
               checked={registrationMode === 'local'}
               onChange={() => setRegistrationMode('local')}
             />
-            Обычная регистрация
+            Обычная регистрация(экспериментально)
           </label>
+          <h1/>
           <label>
             <input
               type="radio"

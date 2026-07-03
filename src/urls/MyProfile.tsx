@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProjectCard from '../components/ProjectCard'
 import type { Project, ProjectFilter } from '../types'
 import * as config from '../config'
@@ -13,53 +13,96 @@ export default function MyProfile() {
   const [profileImage, setProfileImage] = useState(user.avatarUrl || `${config.STATIC_LOCATION}/emptyprofile.png`)
   const [urlInput, setUrlInput] = useState('')
   const [isEditingImage, setIsEditingImage] = useState(false)
+
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false)
   const [activeFilter, setActiveFilter] = useState<ProjectFilter>('new')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
-  const projects: Project[] = [
-    {
-      id: 380,
-      title: 'Первый проект',
-      author: 'John Doe',
-      type: 'Пост',
-      imageUrl: null,
-      likes: 15,
-      comments: 4,
-      views: 20
-    }
-  ]
-
-  const handleSaveDescription = () => {
-    const newDesc = tempDescription.slice(0, 1024).replace(/\n/g, ' ')
-    user.description = newDesc
-    const response = fetch(`${config.BACKEND_URL}/api/change/description`, {
-          method: 'POST',
-          credentials: 'include',
-          body: JSON.stringify({
-            description: newDesc
-          })
-        })
-    setDescription(newDesc)
-    setIsEditingDesc(false)
-  }
-
-  const handleImageUrlSubmit = async() => {
-    if (urlInput.trim()) {
-      setProfileImage(urlInput.trim())
-      user.avatarUrl = urlInput.trim()
-      const response = await fetch(`${config.BACKEND_URL}/api/change/avatarUrl`, {
-          method: 'POST',
-          credentials: 'include',
-          body: JSON.stringify({
-            avatarUrl: urlInput.trim()
-          })
-        })
-      setUrlInput('')
-      setIsEditingImage(false)
+  const fetchProjects = async (pageNum: number, sort: ProjectFilter) => {
+    setIsLoadingProjects(true)
+    try {
+      const response = await fetch(
+        `${config.BACKEND_URL}/api/user/${user.id}/projects?page=${pageNum}&sort=${sort}`,
+        { credentials: 'include' }
+      )
+      const data = await response.json()
+      if (response.ok) {
+        setProjects(data.projects || [])
+        setTotal(data.total || 0)
+        setPage(data.page || 1)
+        setTotalPages(data.totalPages || 1)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки проектов', error)
+    } finally {
+      setIsLoadingProjects(false)
     }
   }
+
+  useEffect(() => {
+    if (user.logined) {
+      fetchProjects(1, activeFilter)
+    }
+  }, [activeFilter])
 
   const handleFilterChange = (filter: ProjectFilter) => {
     setActiveFilter(filter)
+    setPage(1)
+  }
+
+  const goToPage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return
+    fetchProjects(newPage, activeFilter)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleSaveDescription = async () => {
+    const newDesc = tempDescription.slice(0, 1024).replace(/\n/g, ' ')
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/change/description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ description: newDesc })
+      })
+      if (response.ok) {
+        user.description = newDesc
+        setDescription(newDesc)
+        setIsEditingDesc(false)
+      } else {
+        alert('Ошибка сохранения описания')
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения описания', error)
+      alert('Ошибка сети')
+    }
+  }
+
+  const handleImageUrlSubmit = async () => {
+    if (urlInput.trim()) {
+      try {
+        const response = await fetch(`${config.BACKEND_URL}/api/change/avatarUrl`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ avatarUrl: urlInput.trim() })
+        })
+        if (response.ok) {
+          setProfileImage(urlInput.trim())
+          user.avatarUrl = urlInput.trim()
+          setUrlInput('')
+          setIsEditingImage(false)
+        } else {
+          alert('Ошибка обновления аватара')
+        }
+      } catch (error) {
+        console.error('Ошибка обновления аватара', error)
+        alert('Ошибка сети')
+      }
+    }
   }
 
   return (
@@ -138,9 +181,19 @@ export default function MyProfile() {
                 <div className="MPRS-button-text">Изменить описание</div>
               </button>
             ) : (
-              <button onClick={handleSaveDescription} style={{ marginRight: '10px' }}>
-                <div className="MPRS-button-text">Сохранить</div>
-              </button>
+              <>
+                <button onClick={handleSaveDescription} style={{ marginRight: '10px' }}>
+                  <div className="MPRS-button-text">Сохранить</div>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditingDesc(false)
+                    setTempDescription(description)
+                  }}
+                >
+                  <div className="MPRS-button-text">Отмена</div>
+                </button>
+              </>
             )}
           </div>
           <div className="MPRS-Desc">
@@ -168,7 +221,7 @@ export default function MyProfile() {
       </div>
 
       <div className="projects">
-        <div className="p-title">Проекты пользователя:</div>
+        <div className="p-title">Мои проекты:</div>
         <div className="p-buttons">
           <button
             className={activeFilter === 'new' ? 'active' : ''}
@@ -191,11 +244,54 @@ export default function MyProfile() {
         </div>
       </div>
 
+      {isLoadingProjects && <div style={{ textAlign: 'center', padding: '20px' }}>Загрузка проектов...</div>}
+
       <div className="project-projects">
+        {!isLoadingProjects && projects.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+            У вас пока нет проектов. Создайте первый!
+          </div>
+        )}
         {projects.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
       </div>
+
+      {!isLoadingProjects && totalPages > 1 && (
+        <div className="pagination" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', padding: '20px 0', marginTop: '20px' }}>
+          <button
+            disabled={page <= 1}
+            onClick={() => goToPage(1)}
+            style={{ padding: '8px 12px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.5 : 1 }}
+          >
+            &lt;&lt;
+          </button>
+          <button
+            disabled={page <= 1}
+            onClick={() => goToPage(page - 1)}
+            style={{ padding: '8px 16px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.5 : 1 }}
+          >
+            ← Назад
+          </button>
+          <span style={{ fontSize: '14px', color: '#666' }}>
+            Страница {page} из {totalPages} ({total} проектов)
+          </span>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => goToPage(page + 1)}
+            style={{ padding: '8px 16px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: page >= totalPages ? 'not-allowed' : 'pointer', opacity: page >= totalPages ? 0.5 : 1 }}
+          >
+            Вперед →
+          </button>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => goToPage(totalPages)}
+            style={{ padding: '8px 12px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: page >= totalPages ? 'not-allowed' : 'pointer', opacity: page >= totalPages ? 0.5 : 1 }}
+          >
+            &gt;&gt;
+          </button>
+        </div>
+      )}
     </>
   )
 }

@@ -8,7 +8,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [loginMode, setLoginMode] = useState<'local' | 'google'>('local');
+  const [loginMode, setLoginMode] = useState<'local' | 'google'>('google');
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -133,8 +133,9 @@ export default function Login() {
               checked={loginMode === 'local'}
               onChange={() => setLoginMode('local')}
             />
-            Обычный вход
+            Обычный вход(экспериментально)
           </label>
+          <h1/>
           <label>
             <input
               type="radio"

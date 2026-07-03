@@ -10,12 +10,23 @@ type CommentType = Comments
 export default function Project() {
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
+  const [mediaIndex, setMediaIndex] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isFullscreenMedia, setIsFullscreenMedia] = useState(false)
   const [fullscreenMediaIndex, setFullscreenMediaIndex] = useState(0)
   const [urlInput, setUrlInput] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [showWebWarning, setShowWebWarning] = useState(true)
+
+  const [commentPage, setCommentPage] = useState(1)
+  const [commentTotalPages, setCommentTotalPages] = useState(1)
+  const [commentTotal, setCommentTotal] = useState(0)
+  const [isLoadingComments, setIsLoadingComments] = useState(false)
+
+  const [replyPages, setReplyPages] = useState<Record<number, number>>({})
+  const [replyData, setReplyData] = useState<Record<number, { replies: Reply[], total: number, totalPages: number }>>({})
+
 
   const [projectData, setProjectData] = useState<PageProject>({
     id: Number(id) || 0,
@@ -30,7 +41,8 @@ export default function Project() {
     description: '',
     imageUrl: `${config.STATIC_LOCATION}/cover.png`,
     content: '',
-    isOwner: false
+    isOwner: false,
+    isPublished: false
   })
 
   const [editData, setEditData] = useState<{
@@ -54,80 +66,147 @@ export default function Project() {
   useEffect(() => {
     if (!id) return
     fetchProject()
-    fetchComments()
+    fetchComments(1)
   }, [id])
 
-  const fetchProject = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/project/${id}`, {
-        credentials: 'include'
-      })
-      const data = await response.json()
-      if (response.ok) {
-        setProjectData({
-          id: data.project.id,
-          title: data.project.title,
-          type: data.project.type,
-          author: data.project.author || 'Неизвестно',
-          authorId: data.project.user_id,
-          views: data.project.views || 0,
-          likes: data.project.likes || 0,
-          isLiked: data.project.isLiked || false,
-          comments: data.project.comments || 0,
-          description: data.project.description || '',
-          imageUrl: data.project.imageUrl || `${config.STATIC_LOCATION}/cover.png`,
-          content: data.project.content || '',
-          isOwner: data.project.isOwner || false,
-          authorProfile: data.project.authorProfile || null
-        })
-        setEditData({
-          title: data.project.title,
-          description: data.project.content || '',
-          imageUrl: data.project.imageUrl || '',
-          content: data.project.content || ''
-        })
+const fetchProject = async () => {
+  setIsLoading(true)
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/project/${id}`, {
+      credentials: 'include'
+    })
+    const data = await response.json()
+    if (response.ok) {
+      let content = data.project.content || ''
+      if (data.project.type === 'Пост') {
+        if (typeof content === 'string') {
+          try {
+            const parsed = JSON.parse(content)
+            if (Array.isArray(parsed)) {
+              content = parsed
+            } else {
+              content = content ? [content] : []
+            }
+          } catch {
+            content = content ? [content] : []
+          }
+        } else if (!Array.isArray(content)) {
+          content = content ? [content] : []
+        }
       }
-    } catch (error) {
-      console.error('Ошибка загрузки проекта', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/project/${id}/comments`, {
-        credentials: 'include'
+      setProjectData({
+        id: data.project.id,
+        title: data.project.title,
+        type: data.project.type,
+        author: data.project.author || 'Неизвестно',
+        authorId: data.project.user_id,
+        views: data.project.views || 0,
+        likes: data.project.likes || 0,
+        isLiked: data.project.isLiked || false,
+        comments: data.project.comments || 0,
+        description: data.project.description || '',
+        imageUrl: data.project.imageUrl || `${config.STATIC_LOCATION}/cover.png`,
+        content: content,
+        isOwner: data.project.isOwner || false,
+        authorProfile: data.project.authorProfile || null,
+        isPublished: data.project.is_published || false
       })
-      const data = await response.json()
-      if (response.ok) {
-        const comments: CommentType[] = (data.comments || []).map((c: any) => ({
-          id: c.id,
-          author: c.author,
-          authorId: c.user_id,
-          content: c.content,
-          date: c.created_at,
+      setEditData({
+        title: data.project.title,
+        description: data.project.description || '',
+        imageUrl: data.project.imageUrl || '',
+        content: content
+      })
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки проекта', error)
+  } finally {
+    setIsLoading(false)
+  }
+}
+
+const fetchComments = async (pageNum: number = 1) => {
+  setIsLoadingComments(true)
+  try {
+    const response = await fetch(
+      `${config.BACKEND_URL}/api/project/${id}/comments?page=${pageNum}&limit=20&replyLimit=5`,
+      { credentials: 'include' }
+    )
+    const data = await response.json()
+    if (response.ok) {
+      const comments: CommentType[] = (data.comments || []).map((c: any) => ({
+        id: c.id,
+        author: c.author,
+        authorId: c.user_id,
+        content: c.content,
+        date: c.created_at,
+        rankIcon: c.authorIcon || null,
+        rankTitle: c.authorTitle || null,
+        authorProfile: c.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
+        replies: (c.replies || []).map((r: any) => ({
+          id: r.id,
+          author: r.author,
+          authorId: r.user_id,
+          content: r.content,
+          date: r.created_at,
+          rankIcon: r.authorIcon || null,
+          rankTitle: r.authorTitle || null,
+          authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
           rankIcon: c.rankIcon || null,
           rankTitle: c.rankTitle || null,
-          authorProfile: c.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
-          replies: (c.replies || []).map((r: any) => ({
-            id: r.id,
-            author: r.author,
-            authorId: r.user_id,
-            content: r.content,
-            date: r.created_at,
-            rankIcon: r.rankIcon || null,
-            rankTitle: r.rankTitle || null,
-            authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
-          }))
-        }))
-        setCommentsData(comments)
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки комментариев', error)
+        })),
+        totalReplies: c.totalReplies || 0
+      }))
+      setCommentsData(comments)
+      setCommentPage(data.page)
+      setCommentTotalPages(data.totalPages)
+      setCommentTotal(data.total)
     }
+  } catch (error) {
+    console.error('Ошибка загрузки комментариев', error)
+  } finally {
+    setIsLoadingComments(false)
   }
+}
+
+const fetchReplies = async (commentId: number, page: number = 1) => {
+  try {
+    const response = await fetch(
+      `${config.BACKEND_URL}/api/comments/${commentId}/replies?page=${page}&limit=5`,
+      { credentials: 'include' }
+    )
+    const data = await response.json()
+    if (response.ok) {
+      const replies = data.replies.map((r: any) => ({
+        id: r.id,
+        author: r.author,
+        authorId: r.user_id,
+        content: r.content,
+        date: r.created_at,
+        rankIcon: r.authorIcon || null,
+        rankTitle: r.authorTitle || null,
+        authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
+      }))
+      setReplyData(prev => ({
+        ...prev,
+        [commentId]: {
+          replies,
+          total: data.total,
+          totalPages: data.totalPages
+        }
+      }))
+      setReplyPages(prev => ({ ...prev, [commentId]: page }))
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки ответов', error)
+  }
+}
+
+const loadMoreComments = () => {
+  if (commentPage < commentTotalPages) {
+    fetchComments(commentPage + 1)
+  }
+}
 
   const toggleProjectLike = async () => {
     try {
@@ -146,13 +225,6 @@ export default function Project() {
     } catch (error) {
       console.error('Ошибка лайка', error)
     }
-  }
-
-  const toggleReplies = (commentId: number) => {
-    setCollapsedReplies({
-      ...collapsedReplies,
-      [commentId]: !collapsedReplies[commentId]
-    })
   }
 
   const deleteComment = async (commentId: number) => {
@@ -326,15 +398,17 @@ export default function Project() {
     if (!urlInput.trim()) return
     const url = urlInput.trim()
     const extension = url.split('.').pop()?.toLowerCase() || ''
-
+      //&& ['mp4', 'webm', 'ogg', 'mov', 'avi'].includes(extension)
+    //['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'tiff']
+    //&& extension === 'sb3'
     if (type === 'imageUrl') {
       setEditData(prev => ({ ...prev, imageUrl: url }))
       setUrlInput('')
     } else if (type === 'content') {
-      if (projectData.type === 'Scratch' && extension === 'sb3') {
+      if (projectData.type === 'Scratch') {
         setEditData(prev => ({ ...prev, content: url }))
         setUrlInput('')
-      } else if (projectData.type === 'Видео' && ['mp4', 'webm', 'ogg', 'mov', 'avi'].includes(extension)) {
+      } else if (projectData.type === 'Видео') {
         setEditData(prev => ({ ...prev, content: url }))
         setUrlInput('')
       } else if (projectData.type === 'Web') {
@@ -344,8 +418,6 @@ export default function Project() {
         alert('Неверный формат URL для этого типа проекта')
       }
     } else if (type === 'media') {
-      const mediaExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'tiff']
-      if (mediaExtensions.includes(extension)) {
         const currentContent = Array.isArray(editData.content) ? editData.content : []
         if (currentContent.length >= 10) {
           alert('Максимум 10 медиа файлов')
@@ -356,9 +428,7 @@ export default function Project() {
           content: [...currentContent, url]
         }))
         setUrlInput('')
-      } else {
-        alert('Неверный формат медиа файла')
-      }
+      
     }
   }
 
@@ -384,8 +454,11 @@ export default function Project() {
           content: Array.isArray(editData.content) ? JSON.stringify(editData.content) : editData.content,
         }))
         setIsEditing(false)
+      } else {
+        alert(`Ошибка запроса ${response}`)
       }
     } catch (error) {
+      alert(`Ошибка сохранения ${error}`)
       console.error('Ошибка сохранения', error)
     }
   }
@@ -417,7 +490,6 @@ export default function Project() {
         credentials: 'include'
       })
       if (response.ok) {
-        alert('Проект удален')
         window.location.href = '/my-projects'
       }
     } catch (error) {
@@ -473,58 +545,158 @@ export default function Project() {
     }
   }
 
+
+
+const toggleReplies = (commentId: number) => {
+  const isCollapsed = collapsedReplies[commentId]
+  setCollapsedReplies({
+    ...collapsedReplies,
+    [commentId]: !isCollapsed
+  })
+  if (isCollapsed && !replyData[commentId]) {
+    fetchReplies(commentId, 1)
+  }
+}
+
+const loadAllReplies = async (commentId: number) => {
+  try {
+    const response = await fetch(
+      `${config.BACKEND_URL}/api/comments/${commentId}/replies/all`,
+      { credentials: 'include' }
+    )
+    const data = await response.json()
+    if (response.ok) {
+      const allReplies = data.replies.map((r: any) => ({
+        id: r.id,
+        author: r.author,
+        authorId: r.user_id,
+        content: r.content,
+        date: r.created_at,
+        rankIcon: r.rankIcon || null,
+        rankTitle: r.rankTitle || null,
+        authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
+      }))
+      setReplyData(prev => ({
+        ...prev,
+        [commentId]: {
+          replies: allReplies,
+          total: allReplies.length,
+          totalPages: 1
+        }
+      }))
+      setReplyPages(prev => ({ ...prev, [commentId]: 1 }))
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки всех ответов', error)
+  }
+}
+
   const renderCardContent = () => {
     switch (projectData.type) {
-      case 'Пост': {
-        const mediaArray = Array.isArray(projectData.content) ? projectData.content : []
-        const displayImage = mediaArray.length > 0 ? mediaArray[0] : projectData.imageUrl
-        return (
-          <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-            <img
-              src={displayImage || undefined}
-              alt={projectData.title}
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-            {mediaArray.length > 0 && (
-              <div
+
+case 'Пост': {
+  const mediaArray = Array.isArray(projectData.content) ? projectData.content : []
+  const displayImage = mediaArray.length > 0 ? mediaArray[mediaIndex] : projectData.imageUrl
+
+  const goPrev = () => setMediaIndex((prev) => (prev > 0 ? prev - 1 : mediaArray.length - 1))
+  const goNext = () => setMediaIndex((prev) => (prev < mediaArray.length - 1 ? prev + 1 : 0))
+
+  return (
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <img
+        src={displayImage || undefined}
+        alt={projectData.title}
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+      />
+      {mediaArray.length > 1 && (
+        <>
+          <button
+            onClick={goPrev}
+            style={{
+              position: 'absolute',
+              left: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'rgba(0,0,0,0.5)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              fontSize: '20px',
+              cursor: 'pointer',
+              zIndex: 2
+            }}
+          >
+            ‹
+          </button>
+          <button
+            onClick={goNext}
+            style={{
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'rgba(0,0,0,0.5)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              fontSize: '20px',
+              cursor: 'pointer',
+              zIndex: 2
+            }}
+          >
+            ›
+          </button>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '10px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: '6px',
+              background: 'rgba(0,0,0,0.5)',
+              padding: '4px 10px',
+              borderRadius: '12px',
+              alignItems: 'center',
+              zIndex: 2
+            }}
+          >
+            {mediaArray.map((_, idx) => (
+              <span
+                key={idx}
                 style={{
-                  position: 'absolute',
-                  bottom: '10px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  display: 'flex',
-                  gap: '6px',
-                  background: 'rgba(0,0,0,0.5)',
-                  padding: '4px 10px',
-                  borderRadius: '12px',
-                  alignItems: 'center'
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: idx === mediaIndex ? '#fff' : 'rgba(255,255,255,0.4)',
+                  transition: 'all 0.3s'
                 }}
-              >
-                {mediaArray.map((_, idx) => (
-                  <span
-                    key={idx}
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      background: idx === fullscreenMediaIndex ? '#fff' : 'rgba(255,255,255,0.4)',
-                      transition: 'all 0.3s'
-                    }}
-                  />
-                ))}
-                <span style={{ color: '#fff', fontSize: '11px', marginLeft: '4px' }}>{mediaArray.length}</span>
-              </div>
-            )}
+              />
+            ))}
+            <span style={{ color: '#fff', fontSize: '11px', marginLeft: '4px' }}>
+              {mediaIndex + 1}/{mediaArray.length}
+            </span>
           </div>
-        )
-      }
-      case 'Видеo':
-        const videoSrc = typeof projectData.content === 'string' ? projectData.content : ''
-        return (
-          <video controls style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
-            <source src={videoSrc} />
-          </video>
-        )
+        </>
+      )}
+    </div>
+  )
+}
+case 'Видеo': {
+  const videoSrc = typeof projectData.content === 'string' ? projectData.content : ''
+  if (!videoSrc) {
+    return <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5' }}>Видео не загружено</div>
+  }
+  return (
+    <video controls style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
+      <source src={videoSrc} />
+    </video>
+  )
+}
       case 'Scratch':
         const scratchUrl = typeof projectData.content === 'string' ? projectData.content : ''
         return (
@@ -538,15 +710,31 @@ export default function Project() {
             allowFullScreen
           />
         )
-      case 'Web':
-        const webUrl = typeof projectData.content === 'string' ? projectData.content : ''
-        return (
-          <iframe
-            src={webUrl}
-            style={{ width: '100%', height: '100%', border: 'none' }}
-            sandbox="allow-scripts allow-same-origin allow-forms"
-          />
-        )
+case 'Web': {
+  const webUrl = typeof projectData.content === 'string' ? projectData.content : ''
+  if (showWebWarning) {
+    return (
+      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: '#fff3cd', padding: '20px' }}>
+        <p style={{ color: '#856404', marginBottom: '15px', fontSize: '16px' }}>
+          ⚠️ Вы переходите на внешний сайт: <br /><a target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>{webUrl}</a>
+        </p>
+        <button
+          onClick={() => setShowWebWarning(false)}
+          style={{ padding: '10px 30px', background: '#ffc107', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
+        >
+          Продолжить
+        </button>
+      </div>
+    )
+  }
+  return (
+    <iframe
+      src={webUrl}
+      style={{ width: '100%', height: '100%', border: 'none' }}
+      sandbox="allow-scripts allow-same-origin allow-forms"
+    />
+  )
+}
       default:
         return null
     }
@@ -619,13 +807,17 @@ export default function Project() {
             style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
           />
         )
-      case 'Видеo':
-        const videoSrc = typeof projectData.content === 'string' ? projectData.content : ''
-        return (
-          <video controls autoPlay style={{ width: '100%', height: '90vh', objectFit: 'contain' }}>
-            <source src={videoSrc} />
-          </video>
-        )
+case 'Видеo': {
+  const videoSrc = typeof projectData.content === 'string' ? projectData.content : ''
+  if (!videoSrc) {
+    return <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5' }}>Видео не загружено</div>
+  }
+  return (
+    <video controls style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
+      <source src={videoSrc} />
+    </video>
+  )
+}
       case 'Scratch':
         const scratchUrl = typeof projectData.content === 'string' ? projectData.content : ''
         return (
@@ -638,15 +830,31 @@ export default function Project() {
             allowFullScreen
           />
         )
-      case 'Web':
-        const webUrl = typeof projectData.content === 'string' ? projectData.content : ''
-        return (
-          <iframe
-            src={webUrl}
-            style={{ width: '100%', height: '90vh', border: 'none' }}
-            sandbox="allow-scripts allow-same-origin allow-forms"
-          />
-        )
+case 'Web': {
+  const webUrl = typeof projectData.content === 'string' ? projectData.content : ''
+  if (showWebWarning) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', background: '#fff3cd', padding: '20px' }}>
+        <p style={{ color: '#856404', marginBottom: '15px', fontSize: '18px' }}>
+          ⚠️ Вы переходите на внешний сайт: <br /><a href={webUrl} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>{webUrl}</a>
+        </p>
+        <button
+          onClick={() => setShowWebWarning(false)}
+          style={{ padding: '10px 30px', background: '#ffc107', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
+        >
+          Продолжить
+        </button>
+      </div>
+    )
+  }
+  return (
+    <iframe
+      src={webUrl}
+      style={{ width: '100%', height: '90vh', border: 'none' }}
+      sandbox="allow-scripts allow-same-origin allow-forms"
+    />
+  )
+}
       default:
         return null
     }
@@ -693,6 +901,7 @@ export default function Project() {
             <Linkify>{projectData.description}</Linkify>
           </div>
 
+          {!projectData.isOwner && (
           <div className="PCI-likebutton">
             <button onClick={toggleProjectLike}>
               <img
@@ -705,6 +914,7 @@ export default function Project() {
               />
             </button>
           </div>
+          )}
 
           {projectData.isOwner && (
             <div className="PCI-editbutton">
@@ -714,7 +924,7 @@ export default function Project() {
             </div>
           )}
 
-          {user.admin && (
+          {(user.admin || projectData.isOwner) && projectData.isPublished && (
             <div className="PCI-editbutton">
               <button onClick={removeProject} className="edit-btn" style={{ background: 'orange' }}>
                 Снять с публикации
@@ -753,7 +963,7 @@ export default function Project() {
                   value={editData.description}
                   onChange={handleEditChange}
                   rows={4}
-                  maxLength={500}
+                  maxLength={1024}
                 />
               </div>
 
@@ -930,176 +1140,210 @@ export default function Project() {
       )}
 
       <div className="CommentPage">
-        <div>
-          <p>Комментарии:</p>
+  <div>
+    <p>Комментарии:</p>
 
-          <div className="TextInput">
-            <input
-              type="text"
-              placeholder="Напишите комментарий..."
-              value={mainInput}
-              onChange={e => setMainInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && addMainComment()}
-            />
-            <button className="sendCommentBtn" onClick={addMainComment}>
-              Отправить
-            </button>
-          </div>
+    <div className="TextInput">
+      <input
+        type="text"
+        placeholder="Напишите комментарий..."
+        value={mainInput}
+        onChange={e => setMainInput(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && addMainComment()}
+        maxLength={300}
+      />
+      <button className="sendCommentBtn" onClick={addMainComment}>
+        Отправить
+      </button>
+    </div>
 
-          <div className="commentsList">
-            {commentsData.length === 0 ? (
-              <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
-                Комментариев пока нет. Будьте первым!
+    <div className="commentsList">
+      {isLoadingComments && <div style={{ padding: '20px', textAlign: 'center' }}>Загрузка комментариев...</div>}
+      {!isLoadingComments && commentsData.length === 0 ? (
+        <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
+          Комментариев пока нет. Будьте первым!
+        </div>
+      ) : (
+        commentsData.map(comment => {
+          const replies = comment.replies || []
+          const hasReplies = replies.length > 0
+          const hasHiddenReplies = comment.totalReplies && comment.totalReplies > replies.length
+          return (
+            <div key={comment.id} className="commentItem">
+              <div className="commentHeader">
+                <Link to={`/user?id=${comment.authorId}`} className="commentAuthor">
+                  <img src={comment.authorProfile} alt="profile" className="commentAvatar" style={{ borderRadius: '50%' }} />
+                  <div className="commentAuthorInfo">
+                    <div className="commentAuthorNameWrapper">
+                      <span className="commentAuthorName">{comment.author}</span>
+                      {comment.rankIcon && <img src={comment.rankIcon} alt="rank" style={{ height: '16px', width: '16px', marginLeft: '4px' }} />}
+                    </div>
+                    {comment.rankTitle && <span className="commentRankTitle" style={{ color: 'purple', fontSize: '11px' }}>{comment.rankTitle}</span>}
+                  </div>
+                </Link>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="commentDate">{new Date(comment.date + 'Z').toLocaleString()}</span>
+                  {(user.admin || user.name === comment.author) && (
+                    <button onClick={() => deleteComment(comment.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>✕</button>
+                  )}
+                </div>
               </div>
-            ) : (
-              commentsData.map(comment => {
-                const replies = comment.replies || []
-                const hasReplies = replies.length > 0
-                return (
-                  <div key={comment.id} className="commentItem">
-                    <div className="commentHeader">
-                      <Link to={`/user?id=${comment.authorId}`} className="commentAuthor">
-                        <img
-                          src={comment.authorProfile}
-                          alt="profile"
-                          className="commentAvatar"
-                          style={{ borderRadius: '50%' }}
-                        />
-                        <div className="commentAuthorInfo">
-                          <div className="commentAuthorNameWrapper">
-                            <span className="commentAuthorName">{comment.author}</span>
-                            {comment.rankIcon && (
-                              <img
-                                src={comment.rankIcon}
-                                alt="rank"
-                                style={{ height: '16px', width: '16px', marginLeft: '4px' }}
-                              />
-                            )}
+
+              <div className="commentText">{comment.content}</div>
+
+              <div className="commentFooter">
+                <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>Ответить</button>
+                {hasReplies && (
+                  <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
+                    {collapsedReplies[comment.id] ? `Показать ответы` : `Скрыть ответы (${replies.length})`}
+                  </button>
+                )}
+              </div>
+
+              {showReplyForms[comment.id] && (
+                <div className="replyForm">
+                  <input type="text" placeholder="Написать ответ..." value={replyInputs[comment.id] || ''} onChange={e => setReplyInputs({ ...replyInputs, [comment.id]: e.target.value })} onKeyDown={e => e.key === 'Enter' && addReply(comment.id)} maxLength={300} />
+                  <button onClick={() => addReply(comment.id)}>Отправить</button>
+                  <button className="cancelReplyBtn" onClick={() => showReplyForm(comment.id)}>Отмена</button>
+                </div>
+              )}
+
+              {hasReplies && !collapsedReplies[comment.id] && (
+                <div className="childComments">
+                  {!replyData[comment.id] && (
+                    <div style={{ padding: '8px', color: '#999' }}>Загрузка ответов...</div>
+                  )}
+                  {(replyData[comment.id]?.replies || []).map((reply: Reply) => (
+                    <div key={reply.id} className="childComment">
+                      <div className="commentHeader">
+                        <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
+                          <img src={reply.authorProfile} alt="profile" className="commentAvatar" style={{ borderRadius: '50%' }} />
+                          <div className="commentAuthorInfo">
+                            <div className="commentAuthorNameWrapper">
+                              <span className="commentAuthorName">{reply.author}</span>
+                              {reply.rankIcon && <img src={reply.rankIcon} alt="rank" style={{ height: '16px', width: '16px', marginLeft: '4px' }} />}
+                            </div>
+                            {reply.rankTitle && <span className="commentRankTitle" style={{ color: 'purple', fontSize: '13px' }}>{reply.rankTitle}</span>}
                           </div>
-                          {comment.rankTitle && (
-                            <span className="commentRankTitle" style={{ color: 'purple', fontSize: '11px' }}>
-                              {comment.rankTitle}
-                            </span>
+                        </Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className="commentDate">{new Date(reply.date + 'Z').toLocaleString()}</span>
+                          {(user.admin || user.name === reply.author) && (
+                            <button onClick={() => deleteReply(comment.id, reply.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>✕</button>
                           )}
                         </div>
-                      </Link>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span className="commentDate">{new Date(comment.date + 'Z').toLocaleString()}</span>
-                        {(user.admin || user.name === comment.author) && (
-                          <button
-                            onClick={() => deleteComment(comment.id)}
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              color: 'red',
-                              cursor: 'pointer',
-                              fontSize: '16px',
-                              fontWeight: 'bold'
-                            }}
-                          >
-                            ✕
-                          </button>
-                        )}
                       </div>
+                      <div className="commentText">{reply.content}</div>
                     </div>
-
-                    <div className="commentText">{comment.content}</div>
-
-                    <div className="commentFooter">
-                      <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>
-                        Ответить
+                  ))}
+                  {replyData[comment.id] && (
+                    <div className="pagination" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '8px 0' }}>
+                      <button
+                        disabled={replyPages[comment.id] <= 1}
+                        onClick={() => fetchReplies(comment.id, 1)}
+                        style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: replyPages[comment.id] <= 1 ? 'not-allowed' : 'pointer', opacity: replyPages[comment.id] <= 1 ? 0.5 : 1 }}
+                      >
+                        &lt;&lt;
                       </button>
-                      {hasReplies && (
-                        <button className="collapseBtn" onClick={() => toggleReplies(comment.id)}>
-                          {collapsedReplies[comment.id]
-                            ? `Показать ответы (${replies.length})`
-                            : `Скрыть ответы (${replies.length})`}
-                        </button>
-                      )}
+                      <button
+                        disabled={replyPages[comment.id] <= 1}
+                        onClick={() => fetchReplies(comment.id, (replyPages[comment.id] || 1) - 1)}
+                        style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: replyPages[comment.id] <= 1 ? 'not-allowed' : 'pointer', opacity: replyPages[comment.id] <= 1 ? 0.5 : 1 }}
+                      >
+                        ←
+                      </button>
+                      <span style={{ fontSize: '13px' }}>
+                        {replyPages[comment.id] || 1} / {replyData[comment.id]?.totalPages || 1}
+                      </span>
+                      <button
+                        disabled={replyPages[comment.id] >= (replyData[comment.id]?.totalPages || 1)}
+                        onClick={() => fetchReplies(comment.id, (replyPages[comment.id] || 1) + 1)}
+                        style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: replyPages[comment.id] >= (replyData[comment.id]?.totalPages || 1) ? 'not-allowed' : 'pointer', opacity: replyPages[comment.id] >= (replyData[comment.id]?.totalPages || 1) ? 0.5 : 1 }}
+                      >
+                        →
+                      </button>
+                      <button
+                        disabled={replyPages[comment.id] >= (replyData[comment.id]?.totalPages || 1)}
+                        onClick={() => fetchReplies(comment.id, replyData[comment.id]?.totalPages || 1)}
+                        style={{ padding: '4px 10px', border: '1px solid #ddd', borderRadius: '4px', background: 'white', cursor: replyPages[comment.id] >= (replyData[comment.id]?.totalPages || 1) ? 'not-allowed' : 'pointer', opacity: replyPages[comment.id] >= (replyData[comment.id]?.totalPages || 1) ? 0.5 : 1 }}
+                      >
+                        &gt;&gt;
+                      </button>
                     </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })
+      )}
 
-                    {showReplyForms[comment.id] && (
-                      <div className="replyForm">
-                        <input
-                          type="text"
-                          placeholder="Написать ответ..."
-                          value={replyInputs[comment.id] || ''}
-                          onChange={e =>
-                            setReplyInputs({
-                              ...replyInputs,
-                              [comment.id]: e.target.value
-                            })
-                          }
-                          onKeyDown={e => e.key === 'Enter' && addReply(comment.id)}
-                        />
-                        <button onClick={() => addReply(comment.id)}>Отправить</button>
-                        <button className="cancelReplyBtn" onClick={() => showReplyForm(comment.id)}>
-                          Отмена
-                        </button>
-                      </div>
-                    )}
-
-                    {hasReplies && !collapsedReplies[comment.id] && (
-                      <div className="childComments">
-                        {replies.map((reply: Reply) => (
-                          <div key={reply.id} className="childComment">
-                            <div className="commentHeader">
-                              <Link to={`/user?id=${reply.authorId}`} className="commentAuthor">
-                                <img
-                                  src={reply.authorProfile}
-                                  alt="profile"
-                                  className="commentAvatar"
-                                  style={{ borderRadius: '50%' }}
-                                />
-                                <div className="commentAuthorInfo">
-                                  <div className="commentAuthorNameWrapper">
-                                    <span className="commentAuthorName">{reply.author}</span>
-                                    {reply.rankIcon && (
-                                      <img
-                                        src={reply.rankIcon}
-                                        alt="rank"
-                                        style={{ height: '16px', width: '16px', marginLeft: '4px' }}
-                                      />
-                                    )}
-                                  </div>
-                                  {reply.rankTitle && (
-                                    <span className="commentRankTitle" style={{ color: 'purple', fontSize: '13px' }}>
-                                      {reply.rankTitle}
-                                    </span>
-                                  )}
-                                </div>
-                              </Link>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span className="commentDate">{new Date(reply.date + 'Z').toLocaleString()}</span>
-                                {(user.admin || user.name === reply.author) && (
-                                  <button
-                                    onClick={() => deleteReply(comment.id, reply.id)}
-                                    style={{
-                                      background: 'none',
-                                      border: 'none',
-                                      color: 'red',
-                                      cursor: 'pointer',
-                                      fontSize: '16px',
-                                      fontWeight: 'bold'
-                                    }}
-                                  >
-                                    ✕
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                            <div className="commentText">{reply.content}</div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })
-            )}
-          </div>
+      {!isLoadingComments && commentTotalPages > 1 && (
+        <div className="pagination" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', padding: '20px 0', marginTop: '10px' }}>
+          <button
+            disabled={commentPage <= 1}
+            onClick={() => fetchComments(1)}
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              background: 'white',
+              cursor: commentPage <= 1 ? 'not-allowed' : 'pointer',
+              opacity: commentPage <= 1 ? 0.5 : 1
+            }}
+          >
+            &lt;&lt;
+          </button>
+          <button
+            disabled={commentPage <= 1}
+            onClick={() => fetchComments(commentPage - 1)}
+            style={{
+              padding: '8px 16px',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              background: 'white',
+              cursor: commentPage <= 1 ? 'not-allowed' : 'pointer',
+              opacity: commentPage <= 1 ? 0.5 : 1
+            }}
+          >
+            ← Назад
+          </button>
+          <span style={{ fontSize: '14px', color: '#666' }}>
+            Страница {commentPage} из {commentTotalPages} ({commentTotal} комментариев)
+          </span>
+          <button
+            disabled={commentPage >= commentTotalPages}
+            onClick={() => fetchComments(commentPage + 1)}
+            style={{
+              padding: '8px 16px',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              background: 'white',
+              cursor: commentPage >= commentTotalPages ? 'not-allowed' : 'pointer',
+              opacity: commentPage >= commentTotalPages ? 0.5 : 1
+            }}
+          >
+            Вперед →
+          </button>
+          <button
+            disabled={commentPage >= commentTotalPages}
+            onClick={() => fetchComments(commentTotalPages)}
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              background: 'white',
+              cursor: commentPage >= commentTotalPages ? 'not-allowed' : 'pointer',
+              opacity: commentPage >= commentTotalPages ? 0.5 : 1
+            }}
+          >
+            &gt;&gt;
+          </button>
         </div>
-      </div>
+      )}
+    </div>
+  </div>
+</div>
     </>
   )
 }

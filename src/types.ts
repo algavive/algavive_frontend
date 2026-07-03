@@ -21,6 +21,7 @@ export interface PageProject {
   author: string
   authorId: number
   authorProfile?: null | string
+  isPublished: boolean
 
   isLiked: boolean
   isOwner: boolean
@@ -72,7 +73,8 @@ export interface Comments {
   rankIcon?: string,
   rankTitle?: string,
   authorProfile: string,
-  replies: Reply[]
+  replies: Reply[],
+  totalReplies?: number
 }
 
 export interface Notifications {
