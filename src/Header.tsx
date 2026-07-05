@@ -20,13 +20,13 @@ const Header = () => {
           <Link to="/hall-of-fame">Зал Славы</Link>
           {user.logined && (<Link to="/my-projects">Мои проекты</Link>)}
           <Link to="/entertainment">Центр Развлечений</Link>
-          {user.logined && (<Link to="/settings">Настройки</Link>)}
         </div>
       </div>
 
       <div className="h-left-menu">
+        {user.logined && (<Link to="/settings"><img src={`${config.STATIC_LOCATION}/settings.png`} alt='settings' className="h-logo search-button-wrapper" /></Link>)}
         <SearchButton />
-        {user.logined && <NotificationButton />}
+        {/*{user.logined && <NotificationButton />}*/}
         <ProfileHeader />
       </div>
     </div>

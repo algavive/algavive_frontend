@@ -88,7 +88,7 @@ const Trends = () => {
         </div>
       </div>
       <div className="trends-projects" ref={scrollRef}>
-        {isLoading && <div style={{ padding: '20px' }}>Загрузка...</div>}
+        {isLoading && <div style={{ padding: '20px'}}>Загрузка...</div>}
         {!isLoading && projects.length === 0 && (
           <div style={{ padding: '20px', color: '#666' }}>Нет проектов в трендах</div>
         )}

@@ -686,7 +686,7 @@ case 'Пост': {
     </div>
   )
 }
-case 'Видеo': {
+case 'Видео': {
   const videoSrc = typeof projectData.content === 'string' ? projectData.content : ''
   if (!videoSrc) {
     return <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5' }}>Видео не загружено</div>
@@ -807,15 +807,13 @@ case 'Web': {
             style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
           />
         )
-case 'Видеo': {
+case 'Видео': {
   const videoSrc = typeof projectData.content === 'string' ? projectData.content : ''
   if (!videoSrc) {
     return <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5' }}>Видео не загружено</div>
   }
   return (
-    <video controls style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
-      <source src={videoSrc} />
-    </video>
+    <video controls style={{ width: '100%', height: '100%', objectFit: 'contain' }} src={videoSrc} />
   )
 }
       case 'Scratch':
@@ -873,7 +871,6 @@ case 'Web': {
             🔍
           </button>
         </div>
-
         <div className="PageCardInfo">
           <div className="PCI-type">{projectData.type}</div>
 
@@ -1161,7 +1158,7 @@ case 'Web': {
       {isLoadingComments && <div style={{ padding: '20px', textAlign: 'center' }}>Загрузка комментариев...</div>}
       {!isLoadingComments && commentsData.length === 0 ? (
         <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
-          Комментариев пока нет. Будьте первым!
+          Комментариев пока нет.
         </div>
       ) : (
         commentsData.map(comment => {

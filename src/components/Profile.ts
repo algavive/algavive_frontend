@@ -17,7 +17,7 @@ let user: UserClient = {
   id: -1,
   logined: false,
   name: "",
-  admin: false,
+  admin: 0,
   avatarUrl: null,
   description: null
 }

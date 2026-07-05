@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import Notifications from '../types'
 
+/*
 const notifications: Notifications = [
-  { id: 1, type: 'like', user: 'Анна', action: 'лайкнула ваш проект', target: 'Эмулятор NES', time: '5 мин назад', redirectUrl: '#' },
-  { id: 2, type: 'comment', user: 'Дмитрий', action: 'прокомментировал', target: '3D движок', time: 'час назад', redirectUrl: '#' },
-  { id: 3, type: 'reply', user: 'Максим', action: 'ответил на комментарий', target: 'в проекте Эмулятор', time: 'вчера', redirectUrl: '#' },
+  { id: 1, type: 'like', action: 'Ваш проект лайкнули ', target: 'Эмулятор NES', time: '5 мин назад', redirectUrl: '#' },
+  { id: 2, type: 'comment', user: 'Lol', action: 'прокомментировал', target: '3D движок', time: 'час назад', redirectUrl: '#' },
+  { id: 3, type: 'reply', user: 'Skin228', action: 'ответил на ваш комментарий', target: 'в проекте Эмулятор', time: 'вчера', redirectUrl: '#' },
 ]
 
 const getIcon = (type: string): string => {
@@ -76,3 +77,5 @@ export const NotificationButton = () => {
     </div>
   )
 }
+
+*/

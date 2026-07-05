@@ -12,12 +12,13 @@ const Home = () => {
     <div>
     <h1>Добро пожаловать в Algavive</h1>
     
-    <Linkify>{
+    <Linkify><pre>{
 `Так как в этом сайте нету привычной загрузки файлов, как в других сайтах.
 Из-за экономии и старта в бесплатном хостинге. 
-Мы предлагаем использовать файлообменики, типо: catbox.moe ;
-imgbb.com ; posty5.com ; гугл диск и тд.`
-              }</Linkify>
+Мы предлагаем использовать файлообменики, типо: www.image2url.com ; catbox.moe ;
+imgbb.com ; posty5.com (для html проектов) ; github pages (для сайтов) ; гугл диск(через lh3.googleusercontent.com ;
+также для разговорников google docs ссылкой) и тд.`
+              }</pre></Linkify>
     </div>
     </>
   )
