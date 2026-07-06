@@ -11,6 +11,7 @@ export interface UserClient {
   description?: string | null
   userIcon?: string
   userTitle?: string
+  banned?: Object
 }
 
 let user: UserClient = {
@@ -38,7 +39,8 @@ export async function loadUser() {
           hasGoogle: data.user.hasGoogle,
           admin: data.user.admin || false,
           avatarUrl: data.user.avatarUrl || null,
-          description: data.user.description || null
+          description: data.user.description || null,
+          banned: data.user.banned || false
         }
       }
     }

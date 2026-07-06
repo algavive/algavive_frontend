@@ -16,7 +16,8 @@ const Home = () => {
 `Так как в этом сайте нету привычной загрузки файлов, как в других сайтах.
 Из-за экономии и старта в бесплатном хостинге. 
 Мы предлагаем использовать файлообменики, типо: www.image2url.com ; catbox.moe ;
-imgbb.com ; posty5.com (для html проектов) ; github pages (для сайтов) ; гугл диск(через lh3.googleusercontent.com ;
+imgbb.com ; posty5.com (для html проектов) ; github pages (для сайтов) ; vercel.app ; 
+гугл диск(через lh3.googleusercontent.com ;
 также для разговорников google docs ссылкой) и тд.`
               }</pre></Linkify>
     </div>

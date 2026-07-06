@@ -8,6 +8,4 @@ export const FRONTDEV_MODE = window.location.hostname === 'localhost' || window.
 export const BACKEND_URL: string = FRONTDEV_MODE /* Самое главное вставьте Backend_url так как он будет отсылать к api логике*/
 ? "http://localhost:8787"
 :""; 
-export const STATIC_LOCATION: string = FRONTDEV_MODE 
-? "../../static"
-:"";
+export const STATIC_LOCATION: string = "static"

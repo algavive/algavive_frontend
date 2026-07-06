@@ -6,8 +6,11 @@ import { NotificationButton } from './components/NotificationButton'
 
 import user from './components/Profile'
 
+
+
 const Header = () => {
   return (
+    <>
     <div className="header">
       <div className="h-menu">
         <Link to="/">
@@ -30,6 +33,14 @@ const Header = () => {
         <ProfileHeader />
       </div>
     </div>
+    {user.banned && (
+      <div className="header-banned" style={{backgroundColor:'#efefef'}}>
+        Вас забанил {user.banned.admin_name} до {user.banned.duration === '9999-12-31 23:59:59' || user.banned.duration === 'always' 
+          ? 'навсегда' 
+          : new Date(user.banned.duration).toLocaleString('ru-RU', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, hour12: false })}
+      </div>
+    )}
+    </>
   )
 }
 

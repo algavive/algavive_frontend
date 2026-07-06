@@ -146,90 +146,148 @@ export default function Settings(){
     }
   }, [])
 
-  const handleAdminAction = async () => {
-    if (!adminUserId.trim()) {
-      setError('Введите ID пользователя')
-      return
-    }
-    const targetId = parseInt(adminUserId)
-    if (isNaN(targetId)) {
-      setError('Неверный ID')
-      return
-    }
-
-    setAdminActionLoading(true)
-    setError('')
-    setSuccess('')
-
-    let action = ''
-    let value = ''
-
-    if (adminRole === 'moderator') {
-      action = 'set_role'
-      value = '1'
-    } else if (adminRole === 'admin') {
-      action = 'set_role'
-      value = '2'
-    } else if (adminRole === 'deputy-admin') {
-      action = 'set_role'
-      value = '3'
-    } else if (adminRole === 'remove') {
-      action = 'remove_role'
-      value = ''
-    } else if (adminIcon.trim()) {
-      action = 'set_icon'
-      value = adminIcon.trim()
-    } else if (adminTitle.trim()) {
-      action = 'set_title'
-      value = adminTitle.trim()
-    } else if (adminBanDuration) {
-      if (adminBanDuration === 'never') {
-        action = 'unban'
-        value = ''
-      } else {
-        action = 'ban'
-        value = adminBanDuration
-      }
-    } else {
-      setError('Выберите действие или заполните поля')
-      setAdminActionLoading(false)
-      return
-    }
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/admin/action`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          action,
-          targetUserId: targetId,
-          value
-        })
-      })
-      const data = await response.json()
-      if (response.ok) {
-        setSuccess('Действие выполнено')
-        setAdminUserId('')
-        setAdminIcon('')
-        setAdminTitle('')
-        setAdminBanDuration('')
-        setAdminRole('none')
-        fetchAdminLogs(logPage)
-      } else {
-        setError(data.error || 'Ошибка выполнения действия')
-      }
-    } catch (err) {
-      setError('Ошибка сети')
-    } finally {
-      setAdminActionLoading(false)
-    }
+const handleAdminAction = async () => {
+  if (!adminUserId.trim()) {
+    setError('Введите ID пользователя')
+    return
   }
+  const targetId = parseInt(adminUserId)
+  if (isNaN(targetId)) {
+    setError('Неверный ID')
+    return
+  }
+
+  const turnstileToken = turnstileRef.current?.getResponse()
+  if (!turnstileToken) {
+    setError('Пожалуйста, подтвердите, что вы не робот')
+    turnstileRef.current?.reset()
+    return
+  }
+
+  setAdminActionLoading(true)
+  setError('')
+  setSuccess('')
+
+  let action = ''
+  let value = ''
+
+  if (adminRole === 'moderator') {
+    action = 'set_role'
+    value = '1'
+  } else if (adminRole === 'admin') {
+    action = 'set_role'
+    value = '2'
+  } else if (adminRole === 'deputy-admin') {
+    action = 'set_role'
+    value = '3'
+  } else if (adminRole === 'remove') {
+    action = 'remove_role'
+    value = ''
+  } else if (adminIcon.trim()) {
+    action = 'set_icon'
+    value = adminIcon.trim()
+  } else if (adminTitle.trim()) {
+    action = 'set_title'
+    value = adminTitle.trim()
+  } else if (adminBanDuration) {
+    if (adminBanDuration === 'never') {
+      action = 'unban'
+      value = ''
+    } else {
+      action = 'ban'
+      value = adminBanDuration
+    }
+  } else {
+    setError('Выберите действие или заполните поля')
+    setAdminActionLoading(false)
+    return
+  }
+
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/admin/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        action,
+        targetUserId: targetId,
+        value,
+        turnstileToken
+      })
+    })
+    const data = await response.json()
+    if (response.ok) {
+      setSuccess('Действие выполнено')
+      setAdminUserId('')
+      setAdminIcon('')
+      setAdminTitle('')
+      setAdminBanDuration('')
+      setAdminRole('none')
+      turnstileRef.current?.reset()
+      fetchAdminLogs(logPage)
+    } else {
+      setError(data.error || 'Ошибка выполнения действия')
+      turnstileRef.current?.reset()
+    }
+  } catch (err) {
+    setError('Ошибка сети')
+  } finally {
+    setAdminActionLoading(false)
+  }
+}
 
   const goToLogPage = (page: number) => {
     if (page < 1 || page > logTotalPages) return
     fetchAdminLogs(page)
   }
+const handleResetProfile = async () => {
+  if (!adminUserId.trim()) {
+    setError('Введите ID пользователя')
+    return
+  }
+  const targetId = parseInt(adminUserId)
+  if (isNaN(targetId)) {
+    setError('Неверный ID')
+    return
+  }
+  if (!confirm(`Сбросить профиль пользователя с ID ${targetId}? Это удалит аватар, описание и сбросит username.`)) {
+    return
+  }
+
+  setAdminActionLoading(true)
+  setError('')
+  setSuccess('')
+
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/admin/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        action: 'reset_profile',
+        targetUserId: targetId,
+        value: ''
+      })
+    })
+    const data = await response.json()
+    if (response.ok) {
+      setSuccess('Профиль сброшен')
+      setAdminUserId('')
+      setAdminIcon('')
+      setAdminTitle('')
+      setAdminBanDuration('')
+      setAdminRole('none')
+      fetchAdminLogs(logPage)
+    } else {
+      setError(data.error || 'Ошибка')
+    }
+  } catch (err) {
+    setError('Ошибка сети')
+  } finally {
+    setAdminActionLoading(false)
+  }
+}
+
 
   return (
     <>
@@ -294,12 +352,15 @@ export default function Settings(){
         <p>id пользователя:</p>
         <input type="text" value={adminUserId} onChange={e => setAdminUserId(e.target.value)} />
         <p>Картинка иконки для пользователя(типо селебрити или UserIcon):</p>
-        <input type="text" value={adminIcon} onChange={e => setAdminIcon(e.target.value)} />
+        <input type="text" value={adminIcon} onChange={e => setAdminIcon(e.target.value)} placeholder="null" />
         <p>Подпись пользователя(UserTitle)</p>
-        <input type="text" value={adminTitle} onChange={e => setAdminTitle(e.target.value)} />
+        <input type="text" value={adminTitle} onChange={e => setAdminTitle(e.target.value)} placeholder="null" />
         <p>Длительность бана:</p>
         <input type="text" value={adminBanDuration} onChange={e => setAdminBanDuration(e.target.value)} placeholder="5h, 7d, always, never" />
         <h5>он по умолчанию, считает по дням(5h, это час), always-навсегда, never-разбанить</h5>
+        <button onClick={handleResetProfile} disabled={adminActionLoading} style={{ backgroundColor: '#ff9800' }}>
+        <p>Сбросить профиль</p>
+        </button>
         <p>Права администраторов:</p>
         <div>
           <label>
