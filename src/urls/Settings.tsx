@@ -196,8 +196,12 @@ const handleAdminAction = async () => {
     } else {
       action = 'ban'
       value = adminBanDuration
-    }
-  } else {
+    } 
+  } else if (adminRole === 'reset_profile') {
+      action = 'reset_profile'
+      value = ''
+    } 
+  else {
     setError('Выберите действие или заполните поля')
     setAdminActionLoading(false)
     return
@@ -352,15 +356,23 @@ const handleResetProfile = async () => {
         <p>id пользователя:</p>
         <input type="text" value={adminUserId} onChange={e => setAdminUserId(e.target.value)} />
         <p>Картинка иконки для пользователя(типо селебрити или UserIcon):</p>
-        <input type="text" value={adminIcon} onChange={e => setAdminIcon(e.target.value)} placeholder="null" />
+        <input type="text" value={adminIcon} onChange={e => setAdminIcon(e.target.value)} placeholder="static/seleba.png, null" />
         <p>Подпись пользователя(UserTitle)</p>
         <input type="text" value={adminTitle} onChange={e => setAdminTitle(e.target.value)} placeholder="null" />
         <p>Длительность бана:</p>
         <input type="text" value={adminBanDuration} onChange={e => setAdminBanDuration(e.target.value)} placeholder="5h, 7d, always, never" />
         <h5>он по умолчанию, считает по дням(5h, это час), always-навсегда, never-разбанить</h5>
-        <button onClick={handleResetProfile} disabled={adminActionLoading} style={{ backgroundColor: '#ff9800' }}>
-        <p>Сбросить профиль</p>
-        </button>
+        <label>
+          <input
+            type="radio"
+            name="role"
+            value="reset_profile"
+            checked={adminRole === 'reset_profile'}
+            onChange={() => setAdminRole('reset_profile')}
+            style={{color: 'red'}}
+          />
+        <hbr style={{color: 'red', fontSize: '20px'}}>Сбросить профиль(ПРЕДУПРЕЖДАЮ, что это уберет с пользователя автарку, username и описание)</hbr>
+        </label>
         <p>Права администраторов:</p>
         <div>
           <label>

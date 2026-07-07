@@ -447,15 +447,43 @@ button:active {
 
 .PCI-Profile {
   display: flex;
+  vertical-align: middle;
+}
+
+/*
+PageCard{
+  height: 400px;
+  width: 480px;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  outline: 1px solid grey;
+}
+*/
+
+.JustProfileIcon{
+  height: 40px;
+  display: flex;
+  width: auto;   
+  object-fit: cover;
   vertical-align: middle;
 }
 
 .JustProfile {
-  height: 40px; 
-  width: auto;   
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.JustProfile img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  vertical-align: middle;
+  display: block;
 }
 
 .PCI-likebutton {
@@ -652,10 +680,18 @@ button:active {
   gap: 50px;
 }
 .MPLS-img {
-  height: 300px; 
-  width: auto;   
-  object-fit: contain;
-  border-radius: 180px;
+  height: 300px;
+  width: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.MPLS-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .MPLS-button {
   padding: 10px 20px;
@@ -1069,7 +1105,7 @@ button:active {
 .Admin-Panel {
   display: flex;
   justify-content: center;
-  width: 700px;
+  width: 500px;
   height: 700px;
 }
 

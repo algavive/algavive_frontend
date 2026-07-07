@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 import ProjectCard from '../components/ProjectCard'
 import type { Project, ProjectFilter } from '../types'
 import * as config from '../config'
@@ -24,6 +26,7 @@ export default function MyProjects() {
   })
 
   const [urlInput, setUrlInput] = useState('')
+  const turnstileRef = useRef<TurnstileInstance | null>(null)
 
   const fetchProjects = async (pageNum: number, sort: ProjectFilter) => {
     setIsLoading(true)
@@ -74,6 +77,9 @@ export default function MyProjects() {
       return
     }
     setIsModalOpen(true)
+    if (turnstileRef.current) {
+      turnstileRef.current.reset()
+    }
   }
 
   const closeModal = () => {
@@ -87,6 +93,9 @@ export default function MyProjects() {
     })
     setUrlInput('')
     setError('')
+    if (turnstileRef.current) {
+      turnstileRef.current.reset()
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -113,6 +122,12 @@ export default function MyProjects() {
       return
     }
 
+    const turnstileToken = turnstileRef.current?.getResponse()
+    if (!turnstileToken) {
+      setError('Пожалуйста, подтвердите, что вы не робот')
+      return
+    }
+
     setIsCreating(true)
     setError('')
 
@@ -124,7 +139,8 @@ export default function MyProjects() {
         body: JSON.stringify({
           title: newProject.title,
           type: newProject.type,
-          imageUrl: newProject.imageUrl || null
+          imageUrl: newProject.imageUrl || null,
+          turnstileToken
         })
       })
 
@@ -135,10 +151,16 @@ export default function MyProjects() {
         closeModal()
       } else {
         setError(data.error || 'Ошибка создания проекта')
+        if (turnstileRef.current) {
+          turnstileRef.current.reset()
+        }
       }
     } catch (err) {
       console.log(err)
       setError('Ошибка сети, попробуйте позже')
+      if (turnstileRef.current) {
+        turnstileRef.current.reset()
+      }
     } finally {
       setIsCreating(false)
     }
@@ -299,23 +321,6 @@ export default function MyProjects() {
                 </select>
               </div>
 
-              {/*{newProject.type !== 'Пост' && (
-                <div className="form-group">
-                  <label htmlFor="content">
-                    {newProject.type === 'Scratch' && 'Ссылка на .sb3 файл'}
-                    {newProject.type === 'Видео' && 'Ссылка на видео'}
-                    {newProject.type === 'Web' && 'Ссылка на сайт'}
-                  </label>
-                  <input
-                    type="text"
-                    id="content"
-                    name="content"
-                    value={newProject.content}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              )}*/}
-
               <div className="form-group">
                 <label htmlFor="imageUrl">Ссылка на изображение (опционально)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -371,6 +376,12 @@ export default function MyProjects() {
                   </div>
                 )}
               </div>
+
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={config.SITEKEY_TURNSTILE}
+                onError={() => setError('Ошибка загрузки капчи')}
+              />
 
               {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
             </div>

@@ -8,7 +8,7 @@ export function ProfileHeader() {
 			<Link to="/my-profile">
 			<div className="h-profile-name">
           		{user.name}
-          		<img src={user.avatarUrl ? user.avatarUrl : `${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="h-profile" style={{borderRadius: '36px'}} />
+          		<img src={user.avatarUrl ? user.avatarUrl : `${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="JustProfile" style={{borderRadius: '36px'}} />
       		</div>
       	</Link>
 			)

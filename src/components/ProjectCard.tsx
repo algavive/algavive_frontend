@@ -21,7 +21,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
       <div className="tp-author-info">
       <div className="tp-author-name">
         {project.author}
-        <img src={project.authorIcon} className="JustProfile" 
+        <img src={project.authorIcon} className="JustProfileIcon"
           style={{borderRadius: '36px', height: '20px'}}/> 
       </div>
       <div style={{color: 'purple', fontSize: '13px'}}>{project.authorTitle}</div> 

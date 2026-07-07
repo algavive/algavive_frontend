@@ -16,12 +16,12 @@ const UserCard = ({ user }: UserCardProps) => {
       <img src={user.avatarUrl ? user.avatarUrl: `${config.STATIC_LOCATION}/emptyprofile.png`} alt='profile' className="JustProfile" 
         style={{borderRadius: '36px'}}/>
       <div className="tp-author-info">
-      <div style={{color: 'purple'}}>{user.rankTitle}</div> 
       <div className="tp-author-name">
         {user.name}
-        <img src={user.rankIcon} className="JustProfile" 
+        <img src={user.rankIcon} className="JustProfileIcon" 
           style={{borderRadius: '36px', height: '20px'}}/> 
       </div>
+      <div style={{color: 'purple'}}>{user.rankTitle}</div> 
       </div>
       </div>
     </Link>

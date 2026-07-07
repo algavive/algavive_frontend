@@ -1,9 +1,11 @@
 import { useSearchParams, Link } from 'react-router-dom'
-import { useState, ChangeEvent, useEffect } from 'react'
+import { useState, ChangeEvent, useEffect, useRef } from 'react'
 import * as config from '../config'
 import Linkify from 'linkify-react'
 import { PageProject, Comments, Reply } from '../types'
 import user from '../components/Profile'
+import { Turnstile } from '@marsidev/react-turnstile'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 
 type CommentType = Comments
 
@@ -27,6 +29,7 @@ export default function Project() {
   const [replyPages, setReplyPages] = useState<Record<number, number>>({})
   const [replyData, setReplyData] = useState<Record<number, { replies: Reply[], total: number, totalPages: number }>>({})
 
+  const turnstileRef = useRef<TurnstileInstance | null>(null)
 
   const [projectData, setProjectData] = useState<PageProject>({
     id: Number(id) || 0,
@@ -227,28 +230,36 @@ const loadMoreComments = () => {
     }
   }
 
-  const deleteComment = async (commentId: number) => {
-    const comment = commentsData.find(c => c.id === commentId)
-    if (!comment) return
+const deleteComment = async (commentId: number) => {
+  const comment = commentsData.find(c => c.id === commentId)
 
-    if (!user.admin && user.name !== comment.author) {
-      alert('Вы можете удалять только свои комментарии')
-      return
-    }
-    if (!confirm('Удалить комментарий?')) return
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/comments/${commentId}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      })
-      if (response.ok) {
-        setCommentsData(prev => prev.filter(c => c.id !== commentId))
-      }
-    } catch (error) {
-      console.error('Ошибка удаления комментария', error)
-    }
+  if (!user.admin && user.name !== comment.author) {
+    alert('Вы можете удалять только свои комментарии')
+    return
   }
+
+  const turnstileToken = turnstileRef.current?.getResponse()
+  if (!turnstileToken && user.admin) {
+    setError('Пожалуйста, подтвердите, что вы не робот')
+    return
+  }
+
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/comments/${commentId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: user.admin ? JSON.stringify({ turnstileToken }) : undefined
+    })
+    if (response.ok) {
+      setCommentsData(prev => prev.filter(c => c.id !== commentId))
+      turnstileRef.current?.reset()
+    }
+  } catch (error) {
+    console.error('Ошибка удаления комментария', error)
+  }
+}
+
 
   const deleteReply = async (commentId: number, replyId: number) => {
     const comment = commentsData.find(c => c.id === commentId)
@@ -283,40 +294,54 @@ const loadMoreComments = () => {
     }
   }
 
-  const addMainComment = async () => {
-    if (mainInput.trim() === '') return
-    if (!user.logined) {
-      alert('Вы не зашли в аккаунт')
-      return
-    }
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ content: mainInput })
-      })
-      const data = await response.json()
-      if (response.ok) {
-        const newComment: CommentType = {
-          id: data.comment.id,
-          author: data.comment.author,
-          authorId: data.comment.user_id,
-          content: data.comment.content,
-          date: data.comment.created_at,
-          rankIcon: data.comment.rankIcon || null,
-          rankTitle: data.comment.rankTitle || null,
-          authorProfile: data.comment.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
-          replies: []
-        }
-        setCommentsData(prev => [newComment, ...prev])
-        setMainInput('')
-      }
-    } catch (error) {
-      console.error('Ошибка отправки комментария', error)
-    }
+const addMainComment = async () => {
+  if (mainInput.trim() === '') return
+  if (!user.logined) {
+    alert('Вы не зашли в аккаунт')
+    return
   }
+
+  const turnstileToken = turnstileRef.current?.getResponse()
+  if (!turnstileToken) {
+    setError('Пожалуйста, подтвердите, что вы не робот')
+    return
+  }
+
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        content: mainInput,
+        turnstileToken
+      })
+    })
+    const data = await response.json()
+    if (response.ok) {
+      const newComment: CommentType = {
+        id: data.comment.id,
+        author: data.comment.author,
+        authorId: data.comment.user_id,
+        content: data.comment.content,
+        date: data.comment.created_at,
+        rankIcon: data.comment.rankIcon || null,
+        rankTitle: data.comment.rankTitle || null,
+        authorProfile: data.comment.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
+        replies: []
+      }
+      setCommentsData(prev => [newComment, ...prev])
+      setMainInput('')
+      turnstileRef.current?.reset()
+    } else {
+      setError(data.error || 'Ошибка отправки комментария')
+      turnstileRef.current?.reset()
+    }
+  } catch (error) {
+    console.error('Ошибка отправки комментария', error)
+    turnstileRef.current?.reset()
+  }
+}
 
   const showReplyForm = (commentId: number) => {
     setShowReplyForms({
@@ -329,51 +354,65 @@ const loadMoreComments = () => {
     })
   }
 
-  const addReply = async (parentId: number) => {
-    const replyText = replyInputs[parentId]
-    if (!replyText || replyText.trim() === '') return
-    if (!user.logined) {
-      alert('Вы не зашли в аккаунт')
-      return
-    }
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/comments/${parentId}/reply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ content: replyText })
-      })
-      const data = await response.json()
-      if (response.ok) {
-        setCommentsData(prev =>
-          prev.map(c => {
-            if (c.id === parentId) {
-              const newReply: Reply = {
-                id: data.reply.id,
-                author: data.reply.author,
-                authorId: data.reply.user_id,
-                content: data.reply.content,
-                date: data.reply.created_at,
-                rankIcon: data.reply.rankIcon || null,
-                rankTitle: data.reply.rankTitle || null,
-                authorProfile: data.reply.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
-              }
-              return { ...c, replies: [...(c.replies || []), newReply] }
-            }
-            return c
-          })
-        )
-        setReplyInputs({ ...replyInputs, [parentId]: '' })
-        setShowReplyForms({ ...showReplyForms, [parentId]: false })
-        if (collapsedReplies[parentId]) {
-          setCollapsedReplies({ ...collapsedReplies, [parentId]: false })
-        }
-      }
-    } catch (error) {
-      console.error('Ошибка отправки ответа', error)
-    }
+const addReply = async (parentId: number) => {
+  const replyText = replyInputs[parentId]
+  if (!replyText || replyText.trim() === '') return
+  if (!user.logined) {
+    alert('Вы не зашли в аккаунт')
+    return
   }
+
+  const turnstileToken = turnstileRef.current?.getResponse()
+  if (!turnstileToken) {
+    setError('Пожалуйста, подтвердите, что вы не робот')
+    return
+  }
+
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/comments/${parentId}/reply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        content: replyText,
+        turnstileToken
+      })
+    })
+    const data = await response.json()
+    if (response.ok) {
+      setCommentsData(prev =>
+        prev.map(c => {
+          if (c.id === parentId) {
+            const newReply: Reply = {
+              id: data.reply.id,
+              author: data.reply.author,
+              authorId: data.reply.user_id,
+              content: data.reply.content,
+              date: data.reply.created_at,
+              rankIcon: data.reply.rankIcon || null,
+              rankTitle: data.reply.rankTitle || null,
+              authorProfile: data.reply.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
+            }
+            return { ...c, replies: [...(c.replies || []), newReply] }
+          }
+          return c
+        })
+      )
+      setReplyInputs({ ...replyInputs, [parentId]: '' })
+      setShowReplyForms({ ...showReplyForms, [parentId]: false })
+      if (collapsedReplies[parentId]) {
+        setCollapsedReplies({ ...collapsedReplies, [parentId]: false })
+      }
+      turnstileRef.current?.reset()
+    } else {
+      setError(data.error || 'Ошибка отправки ответа')
+      turnstileRef.current?.reset()
+    }
+  } catch (error) {
+    console.error('Ошибка отправки ответа', error)
+    turnstileRef.current?.reset()
+  }
+}
 
   const handleEditClick = () => {
     setIsEditing(true)
@@ -525,25 +564,34 @@ const loadMoreComments = () => {
     }
   }
 
-  const removeProject = async () => {
-    if (!user.admin) {
-      alert('Только администратор может снять проект с публикации')
-      return
-    }
-    if (!confirm('Снять проект с публикации?')) return
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/unpublish`, {
-        method: 'POST',
-        credentials: 'include'
-      })
-      if (response.ok) {
-        alert('Проект снят с публикации')
-      }
-    } catch (error) {
-      console.error('Ошибка снятия с публикации', error)
-    }
+const removeProject = async () => {
+  if (!user.admin) {
+    alert('Только администратор может снять проект с публикации')
+    return
   }
+  if (!confirm('Снять проект с публикации?')) return
+
+  const turnstileToken = turnstileRef.current?.getResponse()
+  if (!turnstileToken) {
+    setError('Пожалуйста, подтвердите, что вы не робот')
+    return
+  }
+
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/unpublish`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ turnstileToken })
+    })
+    if (response.ok) {
+      alert('Проект снят с публикации')
+      turnstileRef.current?.reset()
+    }
+  } catch (error) {
+    console.error('Ошибка снятия с публикации', error)
+  }
+}
 
 
 
@@ -874,15 +922,15 @@ case 'Web': {
         <div className="PageCardInfo">
           <div className="PCI-type">{projectData.type}</div>
 
-          <div className="PCI-profile">
+          <div className="PCI-profile" >
             <Link to={`/user?id=${projectData.authorId}`}>
+              <span style={{ verticalAlign: 'middle' }}>
               <img
                 src={projectData.authorProfile ? projectData.authorProfile :`${config.STATIC_LOCATION}/emptyprofile.png`}
                 alt="profile"
                 className="JustProfile"
-                style={{ borderRadius: '36px' }}
-              />
-              <span style={{ verticalAlign: 'middle' }}>{projectData.author}</span>
+                style={{ borderRadius: '36px' }} />
+                {projectData.author}</span>
             </Link>
           </div>
 
@@ -1152,7 +1200,14 @@ case 'Web': {
       <button className="sendCommentBtn" onClick={addMainComment}>
         Отправить
       </button>
+      
     </div>
+    <Turnstile
+  ref={turnstileRef}
+  siteKey={config.SITEKEY_TURNSTILE}
+  onError={() => setError('Ошибка загрузки капчи')}
+  style={{ marginBottom: '10px' }}
+      />
 
     <div className="commentsList">
       {isLoadingComments && <div style={{ padding: '20px', textAlign: 'center' }}>Загрузка комментариев...</div>}
