@@ -154,9 +154,7 @@ const fetchComments = async (pageNum: number = 1) => {
           date: r.created_at,
           rankIcon: r.authorIcon || null,
           rankTitle: r.authorTitle || null,
-          authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`,
-          rankIcon: c.rankIcon || null,
-          rankTitle: c.rankTitle || null,
+          authorProfile: r.authorProfile || `${config.STATIC_LOCATION}/emptyprofile.png`
         })),
         totalReplies: c.totalReplies || 0
       }))
