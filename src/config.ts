@@ -14,4 +14,4 @@ export const SITEKEY_TURNSTILE: string = captcha_devmode ?
 //Режим для локал хоста сверху, для продакшн снизу
 export const BACKEND_URL: string = FRONTDEV_MODE /* Самое главное вставьте Backend_url так как он будет отсылать к api логике*/
 ? "http://localhost:8787"
-: "https://api.algavive.workers.dev/"; 
+: "https://api.algavive.workers.dev"; 
