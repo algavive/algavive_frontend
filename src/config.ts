@@ -9,7 +9,7 @@ let captcha_devmode = FRONTDEV_MODE
 
 export const SITEKEY_TURNSTILE: string = captcha_devmode ? 
 "1x00000000000000000000AA"
-: "0x4AAAAAADNYSY_vwXC2FIFb"; //Напишите ваш другой ключ от cloudflare turnstile*/
+: "0x4AAAAAADyCxbVzmjE9GAbt"; //Напишите ваш другой ключ от cloudflare turnstile*/
 
 //Режим для локал хоста сверху, для продакшн снизу
 export const BACKEND_URL: string = FRONTDEV_MODE /* Самое главное вставьте Backend_url так как он будет отсылать к api логике*/
