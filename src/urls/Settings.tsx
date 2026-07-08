@@ -356,7 +356,7 @@ const handleResetProfile = async () => {
         <p>id пользователя:</p>
         <input type="text" value={adminUserId} onChange={e => setAdminUserId(e.target.value)} />
         <p>Картинка иконки для пользователя(типо селебрити или UserIcon):</p>
-        <input type="text" value={adminIcon} onChange={e => setAdminIcon(e.target.value)} placeholder="static/seleba.png, null" />
+        <input type="text" value={adminIcon} onChange={e => setAdminIcon(e.target.value)} placeholder="seleba.png, null" />
         <p>Подпись пользователя(UserTitle)</p>
         <input type="text" value={adminTitle} onChange={e => setAdminTitle(e.target.value)} placeholder="null" />
         <p>Длительность бана:</p>
