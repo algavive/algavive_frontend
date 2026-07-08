@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import * as config from '../config'
 
 export const SearchButton = () => {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ export const SearchButton = () => {
   return (
     <div className="search-button-wrapper" ref={menuRef}>
       <button onClick={() => setIsOpen(!isOpen)}>
-        <img src="/search.png" alt='search' className="h-profile"/>
+        <img src={`${config.STATIC_LOCATION}/search.png`} alt='search' className="h-profile"/>
       </button>
       
       {isOpen && (
