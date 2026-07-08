@@ -1,4 +1,4 @@
-export const STATIC_LOCATION: string = "static"
+export const STATIC_LOCATION: string = ""
 //Публичные ключи
 export const GOOGLE_CLIENT_ID: string = "55121685745-c31lj4mjqtrfobfthu3i8p3l1gau4bkf.apps.googleusercontent.com"; // ключ от google console для oautn
 //фронтдев мод
