@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "start": "start http://localhost:5173/ & vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check": "tsc --noEmit"
+    "dev": "npx vite",
+    "start": "start http://localhost:5173/ & npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview",
+    "check": "npx tsc --noEmit"
   },
   "dependencies": {
     "linkify-react": "^4.3.3",
