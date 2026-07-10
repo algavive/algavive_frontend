@@ -14,6 +14,8 @@ export interface UserClient {
   banned?: Object
 }
 
+export let GlobalResponse: string;
+
 let user: UserClient = {
   id: -1,
   logined: false,
@@ -43,6 +45,8 @@ export async function loadUser() {
           banned: data.user.banned || false
         }
       }
+    } else {
+      GlobalResponse = await res.json();
     }
   } catch (e) {
     console.error(e)

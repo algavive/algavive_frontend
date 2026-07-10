@@ -5,7 +5,7 @@ import { SearchButton } from './components/SearchButton'
 import { NotificationButton } from './components/NotificationButton'
 
 import user from './components/Profile'
-
+import {GlobalResponse} from './components/Profile'
 
 
 const Header = () => {
@@ -40,6 +40,14 @@ const Header = () => {
           : new Date(user.banned.duration).toLocaleString('ru-RU', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, hour12: false })}
       </div>
     )}
+
+    {GlobalResponse && (
+      <div className="header-banned" style={{backgroundColor:'#efefef'}}>
+        {GlobalResponse.error}
+      </div>
+      )
+    }
+
     </>
   )
 }
