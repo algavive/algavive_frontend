@@ -420,6 +420,10 @@ button:active {
 
 .PageCardInfo {}
 
+.PCI-name {
+  width: 480px;
+}
+
 .PCI-description {
   width: 480px;
   overflow-y: auto;
@@ -428,6 +432,37 @@ button:active {
   padding: 10px;
   line-height: 1.5;
   font-size: 16px;
+}
+
+@media (max-width:1000px) {
+  .PageProject {
+    flex-direction: column;      
+    align-items: center;         
+    gap: 20px;                  
+    padding: 20px;              
+  }
+
+  .PageCard {
+    width: 100%;                
+    max-width: 480px;            
+    height: 300px;               
+  }
+
+  .PageCardInfo {
+    width: 100%;                 
+    max-width: 480px;
+  }
+
+  .PCI-name,
+  .PCI-description {
+    width: 100%;                
+    max-width: 480px;
+  }
+
+  .PCI-description {
+    max-height: 200px;           
+    overflow-y: auto;            
+  }
 }
 
 .PCI-description bdi {
@@ -508,8 +543,9 @@ PageCard{
 }
 
 .TextInput{
-  width: 999px;
+  width: auto;
 }
+/*@media (max-width:768px) {*/
 
 
 /*Комментарии под проектом*/
@@ -544,6 +580,11 @@ PageCard{
 .commentsList {
   margin-top: 20px;
   width: 999px;
+}
+@media (max-width:768px) {
+  .commentsList {
+    width: 499px;
+  }
 }
 
 .commentItem {
@@ -598,6 +639,11 @@ PageCard{
   font-size: 14px;
   line-height: 1.4;
   padding-left: 40px;
+  width: auto; 
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal; 
 }
 
 .commentFooter {

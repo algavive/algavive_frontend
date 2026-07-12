@@ -301,7 +301,7 @@ const handleResetProfile = async () => {
 
        {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         {success && <div style={{ color: 'green', marginTop: '10px' }}>{success}</div>}
-    <h2>Юзернейм:</h2>
+    <h2>Юзернейм(сменить можно раз в день):</h2>
       <input 
         type="text"
         value={username}
@@ -311,10 +311,10 @@ const handleResetProfile = async () => {
       
       <div className="settings-section">
         <h2>Google аккаунт</h2>
-        <p style={{ color: '#666', marginBottom: '15px' }}>
+        <p style={{ color: '#666', marginBottom: '15px', width:'499px' }}>
           {user.hasGoogle 
             ? 'У вас уже привязан гугл аккаунт. Нажмите кнопку, чтобы сменить владельца.' 
-            : 'Можно привязать гугл аккаунт, чтобы иметь возможность входить без пароля и обезопасить аккаунт.'}
+            : 'Можно привязать гугл аккаунт, чтобы иметь возможность входить без пароля и обезопасить аккаунт. Но предупреждаю, то что обратно классический вход невозможно будет вернуть.'}
         </p>
         
         <Turnstile

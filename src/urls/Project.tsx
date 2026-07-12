@@ -21,6 +21,8 @@ export default function Project() {
   const [isLoading, setIsLoading] = useState(true)
   const [showWebWarning, setShowWebWarning] = useState(true)
 
+  const [error, setError] = useState<string>('')
+
   const [commentPage, setCommentPage] = useState(1)
   const [commentTotalPages, setCommentTotalPages] = useState(1)
   const [commentTotal, setCommentTotal] = useState(0)
@@ -158,10 +160,37 @@ const fetchComments = async (pageNum: number = 1) => {
         })),
         totalReplies: c.totalReplies || 0
       }))
+
       setCommentsData(comments)
       setCommentPage(data.page)
       setCommentTotalPages(data.totalPages)
       setCommentTotal(data.total)
+
+      const newReplyData: Record<number, { replies: Reply[], total: number, totalPages: number }> = {}
+      const newCollapsed: Record<number, boolean> = {}
+
+      comments.forEach(comment => {
+        newCollapsed[comment.id] = false 
+
+        if (comment.replies && comment.replies.length > 0) {
+          newReplyData[comment.id] = {
+            replies: comment.replies,
+            total: comment.totalReplies || comment.replies.length,
+            totalPages: Math.ceil((comment.totalReplies || comment.replies.length) / 5) 
+          }
+        } else {
+          newReplyData[comment.id] = {
+            replies: [],
+            total: comment.totalReplies || 0,
+            totalPages: 0
+          }
+        }
+
+        setReplyPages(prev => ({ ...prev, [comment.id]: 1 }))
+      })
+
+      setReplyData(newReplyData)
+      setCollapsedReplies(newCollapsed)
     }
   } catch (error) {
     console.error('Ошибка загрузки комментариев', error)
@@ -266,6 +295,12 @@ const deleteComment = async (commentId: number) => {
     const reply = replies.find(r => r.id === replyId)
     if (!reply) return
 
+    const turnstileToken = turnstileRef.current?.getResponse()
+    if (!turnstileToken && user.admin) {
+      setError('Пожалуйста, подтвердите, что вы не робот')
+      return
+    }
+
     if (!user.admin && user.name !== reply.author) {
       alert('Вы можете удалять только свои ответы')
       return
@@ -275,7 +310,9 @@ const deleteComment = async (commentId: number) => {
     try {
       const response = await fetch(`${config.BACKEND_URL}/api/comments/${replyId}`, {
         method: 'DELETE',
-        credentials: 'include'
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: user.admin ? JSON.stringify({ turnstileToken }) : undefined
       })
       if (response.ok) {
         setCommentsData(prev =>
@@ -329,6 +366,8 @@ const addMainComment = async () => {
         replies: []
       }
       setCommentsData(prev => [newComment, ...prev])
+      setCollapsedReplies(prev => ({ ...prev, [newComment.id]: false })) //
+      fetchReplies(newComment.id, 1) //
       setMainInput('')
       turnstileRef.current?.reset()
     } else {
@@ -397,9 +436,9 @@ const addReply = async (parentId: number) => {
         })
       )
       setReplyInputs({ ...replyInputs, [parentId]: '' })
-      setShowReplyForms({ ...showReplyForms, [parentId]: false })
+      setShowReplyForms({ ...showReplyForms, [parentId]: true })
       if (collapsedReplies[parentId]) {
-        setCollapsedReplies({ ...collapsedReplies, [parentId]: false })
+        setCollapsedReplies({ ...collapsedReplies, [parentId]: true })
       }
       turnstileRef.current?.reset()
     } else {
@@ -595,11 +634,12 @@ const removeProject = async () => {
 
 
 const toggleReplies = (commentId: number) => {
-  const isCollapsed = collapsedReplies[commentId]
-  setCollapsedReplies({
-    ...collapsedReplies,
-    [commentId]: !isCollapsed
-  })
+  const isCollapsed = collapsedReplies[commentId] ?? true
+  const newCollapsed = !isCollapsed
+  setCollapsedReplies(prev => ({
+    ...prev,
+    [commentId]: !prev[commentId]
+  }))
   if (isCollapsed && !replyData[commentId]) {
     fetchReplies(commentId, 1)
   }
@@ -1259,7 +1299,7 @@ case 'Web': {
                 </div>
               )}
 
-              {hasReplies && !collapsedReplies[comment.id] && (
+              {hasReplies && !(collapsedReplies[comment.id] ?? true) && (
                 <div className="childComments">
                   {!replyData[comment.id] && (
                     <div style={{ padding: '8px', color: '#999' }}>Загрузка ответов...</div>
