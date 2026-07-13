@@ -412,6 +412,7 @@ button:active {
   outline: 1px solid grey;
 }
 
+
 .PageCard img {
   width: 100%;
   height: 100%;
@@ -434,7 +435,7 @@ button:active {
   font-size: 16px;
 }
 
-@media (max-width:1000px) {
+@media (max-width:999px) {
   .PageProject {
     flex-direction: column;      
     align-items: center;         
@@ -719,11 +720,34 @@ PageCard{
 
 /*Профили*/
 
+/*
+.PageProject{
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  padding: 100px;
+}
+.PageProject {
+    flex-direction: column;      
+    align-items: center;         
+    gap: 20px;                  
+    padding: 20px;              
+  }
+*/
+
 .MyProfile {
   display: flex;
   justify-content: center;
   padding: 100px;
   gap: 50px;
+}
+@media (max-width:999px) {
+  .MyProfile{
+    flex-direction: column;      
+    align-items: center;         
+    gap: 20px;                  
+    padding: 20px;  
+  }
 }
 .MPLS-img {
   height: 300px;
@@ -760,6 +784,7 @@ PageCard{
 
 .MPRS-Name {
   font-size: 24px;
+  width: 500px;
 }
 
 .MPRS-Desc {
@@ -776,6 +801,18 @@ PageCard{
 
 .MPRS-Desc a:hover {
   color: #9b59b6;
+}
+
+@media (max-width:768px) {
+  .MPRS-Name {
+    font-size: 24px;
+    padding: 20px;
+    width: 100px;
+  }
+  .MPRS-Desc {
+    padding: 20px 0px;
+    width: 350px;
+  }
 }
 
 .MPRS-button {
@@ -796,6 +833,14 @@ PageCard{
 .MPRS-button-text {
   color: white;
   font-size: 24px;
+  width: 500px;
+}
+
+@media (max-width:768px) {
+  .MPRS-button-text {
+    width: 80px;
+    font-size: 18px;
+  }
 }
 
 .SettingsLink {}

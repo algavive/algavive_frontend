@@ -120,6 +120,16 @@ export default function User() {
           </div>
           <div className="MPRS-Desc">
             {user.description ? <Linkify>{user.description}</Linkify> : <h1 style={{color: 'red'}}>Описание отсутствует</h1>}
+            {
+              user.admin === 1 && 
+                (<h3 style={{color: 'blue'}}>Модератор Algavive</h3>) ||
+              user.admin === 2 &&
+                (<h3 style={{color: 'blue'}}>Администратор Algavive</h3>) ||
+              user.admin === 3 && 
+                (<h3 style={{color: 'blue'}}>Вице-Администратор Algavive</h3>) ||
+              user.admin === 9 &&
+                (<h3 style={{color: 'blue'}}>Владелец Algavive</h3>)
+            }
           </div>
         </div>
       </div>

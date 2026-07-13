@@ -110,7 +110,7 @@ const fetchProject = async () => {
         isLiked: data.project.isLiked || false,
         comments: data.project.comments || 0,
         description: data.project.description || '',
-        imageUrl: data.project.imageUrl || `${config.STATIC_LOCATION}/cover.png`,
+        imageUrl: data.project.imageUrl || null,
         content: content,
         isOwner: data.project.isOwner || false,
         authorProfile: data.project.authorProfile || null,
@@ -260,13 +260,13 @@ const loadMoreComments = () => {
 const deleteComment = async (commentId: number) => {
   const comment = commentsData.find(c => c.id === commentId)
 
-  if (!user.admin && user.name !== comment.author) {
+  if (!user.admin > 1 && user.name !== comment.author) {
     alert('Вы можете удалять только свои комментарии')
     return
   }
 
   const turnstileToken = turnstileRef.current?.getResponse()
-  if (!turnstileToken && user.admin) {
+  if (!turnstileToken && user.admin > 1) {
     setError('Пожалуйста, подтвердите, что вы не робот')
     return
   }
@@ -296,12 +296,12 @@ const deleteComment = async (commentId: number) => {
     if (!reply) return
 
     const turnstileToken = turnstileRef.current?.getResponse()
-    if (!turnstileToken && user.admin) {
+    if (!turnstileToken && user.admin > 1) {
       setError('Пожалуйста, подтвердите, что вы не робот')
       return
     }
 
-    if (!user.admin && user.name !== reply.author) {
+    if (!user.admin > 1 && user.name !== reply.author) {
       alert('Вы можете удалять только свои ответы')
       return
     }
@@ -554,7 +554,7 @@ const addReply = async (parentId: number) => {
   }
 
   const deleteProject = async () => {
-    if (!user.admin && !projectData.isOwner) {
+    if (!projectData.isOwner) {
       alert('У вас нет прав на удаление этого проекта')
       return
     }
@@ -588,6 +588,10 @@ const addReply = async (parentId: number) => {
   }
 
   const handlePublishEntertaiment = async () => {
+    if (!user.admin) {
+      alert('У вас нет прав на удаление этого проекта')
+      return
+    }
     try {
       const response = await fetch(`${config.BACKEND_URL}/api/project/${projectData.id}/publish-entertaiment`, {
         method: 'POST',
@@ -1008,7 +1012,7 @@ case 'Web': {
             </div>
           )}
 
-          {(user.admin || projectData.isOwner) && projectData.isPublished && (
+          {(user.admin > 1 || projectData.isOwner) && projectData.isPublished && (
             <div className="PCI-editbutton">
               <button onClick={removeProject} className="edit-btn" style={{ background: 'orange' }}>
                 Снять с публикации
@@ -1274,7 +1278,7 @@ case 'Web': {
                 </Link>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span className="commentDate">{new Date(comment.date + 'Z').toLocaleString()}</span>
-                  {(user.admin || user.name === comment.author) && (
+                  {(user.admin > 1 || user.name === comment.author) && (
                     <button onClick={() => deleteComment(comment.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>✕</button>
                   )}
                 </div>
@@ -1319,7 +1323,7 @@ case 'Web': {
                         </Link>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span className="commentDate">{new Date(reply.date + 'Z').toLocaleString()}</span>
-                          {(user.admin || user.name === reply.author) && (
+                          {(user.admin > 1 || user.name === reply.author) && (
                             <button onClick={() => deleteReply(comment.id, reply.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>✕</button>
                           )}
                         </div>
