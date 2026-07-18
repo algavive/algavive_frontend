@@ -939,7 +939,7 @@ case 'Web': {
   return (
     <iframe
       src={webUrl}
-      style={{ width: '100%', height: '90vh', border: 'none' }}
+      style={{ width: '100%', height: '90vh', border: 'none', background: 'white' }}
       sandbox="allow-scripts allow-same-origin allow-forms"
     />
   )
@@ -1219,11 +1219,11 @@ case 'Web': {
       {(isFullscreen || isFullscreenMedia) && (
         <div className="fullscreen-overlay" onClick={closeFullscreen}>
           <div className="fullscreen-content" onClick={e => e.stopPropagation()}>
-            <button className="fullscreen-close" onClick={closeFullscreen}>
-              ×
-            </button>
             {renderFullscreenContent()}
           </div>
+          <button className="fullscreen-close" style={{}} onClick={closeFullscreen}>
+              ×
+            </button>
         </div>
       )}
 
@@ -1284,7 +1284,7 @@ case 'Web': {
                 </div>
               </div>
 
-              <div className="commentText">{comment.content}</div>
+              <Linkify><div className="commentText">{comment.content}</div></Linkify>
 
               <div className="commentFooter">
                 <button className="replyBtn" onClick={() => showReplyForm(comment.id)}>Ответить</button>
@@ -1328,7 +1328,7 @@ case 'Web': {
                           )}
                         </div>
                       </div>
-                      <div className="commentText">{reply.content}</div>
+                      <Linkify><div className="commentText">{reply.content}</div></Linkify>
                     </div>
                   ))}
                   {replyData[comment.id] && (

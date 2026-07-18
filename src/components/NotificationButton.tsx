@@ -1,19 +1,22 @@
 import { useState, useRef, useEffect } from 'react'
 import Notifications from '../types'
 
-/*
+
 const notifications: Notifications = [
-  { id: 1, type: 'like', action: 'Ваш проект лайкнули ', target: 'Эмулятор NES', time: '5 мин назад', redirectUrl: '#' },
-  { id: 2, type: 'comment', user: 'Lol', action: 'прокомментировал', target: '3D движок', time: 'час назад', redirectUrl: '#' },
-  { id: 3, type: 'reply', user: 'Skin228', action: 'ответил на ваш комментарий', target: 'в проекте Эмулятор', time: 'вчера', redirectUrl: '#' },
+  { id: 1, type: 'like', action: 'Ваш проект "Эмулятор NES" кто-то лайкнул', time: '2026-07-03 15:56:57', redirectUrl: '#' },
+  { id: 2, type: 'comment', action: 'Ваш проект "Эмулятор NES" кто-то прокоментировал', time: '2026-07-03 15:56:57', redirectUrl: '#' },
+  { id: 3, type: 'reply', action: 'Skin228 ответил на ваш комментарий под проектом "Эмулятор NES"', time: '2026-07-03 15:56:57', redirectUrl: '#' },
 ]
+
+
+let isDev: boolean = true;
 
 const getIcon = (type: string): string => {
   switch(type) {
     case 'like': return '👍'
     case 'comment': return '💬'
-    case 'friend': return '👥'
     case 'reply': return '↩️'
+    case 'admin': return '👥'
     default: return '📢'
   }
 }
@@ -36,7 +39,6 @@ export const NotificationButton = () => {
     window.location.href = redirectUrl
     setIsOpen(false)
   }
-
   return (
     <div className="notification-button-wrapper" ref={menuRef}>
       <button onClick={() => setIsOpen(!isOpen)}>
@@ -50,6 +52,8 @@ export const NotificationButton = () => {
             <span className="notif-count">{notifications.length}</span>
           </div>
           <div className="notif-list">
+            { !isDev ? (
+              <>
             {notifications.length === 0 ? (
               <div className="notif-empty">Нет уведомлений</div>
             ) : (
@@ -63,14 +67,14 @@ export const NotificationButton = () => {
                   <div className="notif-icon">{getIcon(n.type)}</div>
                   <div className="notif-content">
                     <div className="notif-text">
-                      <strong>{n.user}</strong> {n.action}
-                      {n.target && <span className="notif-target"> «{n.target}»</span>}
+                      {n.action}
                     </div>
                     <div className="notif-time">{n.time}</div>
                   </div>
                 </div>
               ))
-            )}
+            )} </> ) : (<h3>Уведомление в стадии разработки</h3>)
+          }
           </div>
         </div>
       )}
@@ -78,4 +82,3 @@ export const NotificationButton = () => {
   )
 }
 
-*/

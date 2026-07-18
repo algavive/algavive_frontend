@@ -80,9 +80,7 @@ export interface Comments {
 export interface Notifications {
   id: number,
   type: string,
-  user?: string,
   action: string,
-  target: string,
   time: string,
   redirectUrl: string
 }

@@ -318,6 +318,7 @@ export default function MyProjects() {
                   <option value="Scratch">Scratch</option>
                   <option value="Видео">Видео</option>
                   <option value="Web">Web</option>
+                  {user.admin > 1 && (<option value="RewardGiver">RewardGiver(для администраторов)</option>)}
                 </select>
               </div>
 
