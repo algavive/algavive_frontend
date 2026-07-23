@@ -6,6 +6,7 @@ import { PageProject, Comments, Reply } from '../types'
 import user from '../components/Profile'
 import { Turnstile } from '@marsidev/react-turnstile'
 import type { TurnstileInstance } from '@marsidev/react-turnstile'
+import UserCard from '../components/UserCard'
 
 type CommentType = Comments
 
@@ -67,6 +68,11 @@ export default function Project() {
   const [replyInputs, setReplyInputs] = useState<Record<number, string>>({})
   const [showReplyForms, setShowReplyForms] = useState<Record<number, boolean>>({})
   const [collapsedReplies, setCollapsedReplies] = useState<Record<number, boolean>>({})
+
+  const [rewardUsers, setRewardUsers] = useState<any[]>([])
+  const [rewardPage, setRewardPage] = useState(1)
+  const [rewardTotalPages, setRewardTotalPages] = useState(1)
+  const [rewardLoading, setRewardLoading] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -490,6 +496,9 @@ const addReply = async (parentId: number) => {
       } else if (projectData.type === 'Web') {
         setEditData(prev => ({ ...prev, content: url }))
         setUrlInput('')
+      } else if (projectData.type.startsWith('RewardGiver')) {
+        setEditData(prev => ({ ...prev, content: url }))
+        setUrlInput('')
       } else {
         alert('Неверный формат URL для этого типа проекта')
       }
@@ -682,8 +691,174 @@ const loadAllReplies = async (commentId: number) => {
   }
 }
 
+const fetchRewardUsers = async (page: number) => {
+  if (!id) return
+  setRewardLoading(true)
+  try {
+    const res = await fetch(`${config.BACKEND_URL}/api/project/${id}/rewards?page=${page}&limit=5`, {
+      credentials: 'include'
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setRewardUsers(data.users || [])
+      setRewardPage(data.page)
+      setRewardTotalPages(data.totalPages || 1)
+    }
+  } catch (e) {
+    console.error('Failed to load reward users', e)
+  } finally {
+    setRewardLoading(false)
+  }
+}
+
+const goToRewardPage = (newPage: number) => {
+  if (newPage < 1 || newPage > rewardTotalPages) return
+  fetchRewardUsers(newPage)
+}
+
+const addProfileIcon = async () => {
+  const response = await fetch(`${config.BACKEND_URL}/api/change/reward/icon`, {
+        method: 'POST',
+        body: JSON.stringify({projectId: Number(id)}),
+        credentials: 'include'
+      })
+  const data = await response.json()
+  if (response.ok) {
+    alert('Вы успешно поменяли иконку')
+  } else if (response.status === 403) {
+    alert('У вас нету награды')
+  } else {
+    alert('Ошибка')
+  }
+} 
+
+const addProfileTitle = async () => {
+  const response = await fetch(`${config.BACKEND_URL}/api/change/reward/title`, {
+        method: 'POST',
+        body: JSON.stringify({projectId: Number(id)}),
+        credentials: 'include'
+      })
+  const data = await response.json()
+  if (response.ok) {
+    alert('Вы успешно поменяли титул')
+  } else if (response.status === 403) {
+    alert('У вас нету награды')
+  } else {
+    alert('Ошибка')
+  }
+}
+useEffect(() => {
+  if (projectData?.type === 'RewardGiverIcon' || projectData?.type === 'RewardGiverTitle') {
+    fetchRewardUsers(1)
+  }
+}, [id, projectData?.type])
   const renderCardContent = () => {
     switch (projectData.type) {
+
+case 'RewardGiverIcon': {
+  const ExampleUser = {
+    id: -1, 
+    avatarUrl: null, 
+    name: "User", 
+    rankIcon: projectData.content, 
+    rankTitle: null
+  };
+  return (
+    <>
+    <div className="reward-giver-wrapper">
+      <UserCard 
+        key={ExampleUser.id} 
+        user={ExampleUser}
+      />
+      <div style={{padding:'24px 0px'}}>
+      <button onClick={addProfileIcon} style={{fontSize:'18px', background:'#aaaaaa'}}>Поставить иконку в свой профиль</button>
+    </div>
+    <div className="reward-users-list">
+  <div style={{ fontWeight: 'bold', marginTop: '10px' }}>Получили:</div>
+  {rewardLoading ? (
+    <div>Загрузка...</div>
+  ) : rewardUsers.length === 0 ? (
+    <div>Пока никто не получил</div>
+  ) : (
+    <>
+      {rewardUsers.map((u: any) => (
+        <UserCard key={u.id} user={u} />
+      ))}
+      <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+        <button 
+          disabled={rewardPage <= 1} 
+          onClick={() => goToRewardPage(rewardPage - 1)}
+        >
+          Назад
+        </button>
+        <span>Стр. {rewardPage} из {rewardTotalPages}</span>
+        <button 
+          disabled={rewardPage >= rewardTotalPages} 
+          onClick={() => goToRewardPage(rewardPage + 1)}
+        >
+          Вперёд
+        </button>
+      </div>
+    </>
+  )}
+</div>
+    </div>
+    </>
+  );
+}
+
+case 'RewardGiverTitle': {
+  const ExampleUser = {
+    id: -1, 
+    avatarUrl: null, 
+    name: "User", 
+    rankIcon: null, 
+    rankTitle: projectData.content
+  };
+  return (
+    <>
+    <div className="reward-giver-wrapper">
+      <UserCard 
+        key={ExampleUser.id} 
+        user={ExampleUser}
+      />
+      <div style={{padding:'24px 0px'}}>
+      <button onClick={addProfileTitle} style={{fontSize:'18px', background:'#aaaaaa'}}>Поставить титул в свой профиль</button>
+    </div>
+    <div className="reward-users-list">
+  <div style={{ fontWeight: 'bold', marginTop: '10px' }}>Получили:</div>
+  {rewardLoading ? (
+    <div>Загрузка...</div>
+  ) : rewardUsers.length === 0 ? (
+    <div>Пока никто не получил</div>
+  ) : (
+    <>
+      {rewardUsers.map((u: any) => (
+        <UserCard key={u.id} user={u} />
+      ))}
+      <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+        <button 
+          disabled={rewardPage <= 1} 
+          onClick={() => goToRewardPage(rewardPage - 1)}
+        >
+          Назад
+        </button>
+        <span>Стр. {rewardPage} из {rewardTotalPages}</span>
+        <button 
+          disabled={rewardPage >= rewardTotalPages} 
+          onClick={() => goToRewardPage(rewardPage + 1)}
+        >
+          Вперёд
+        </button>
+      </div>
+    </>
+  )}
+</div>
+    </div>
+    </>
+  );
+}
+
 
 case 'Пост': {
   const mediaArray = Array.isArray(projectData.content) ? projectData.content : []
@@ -958,9 +1133,9 @@ case 'Web': {
       <div className="PageProject">
         <div className="PageCard">
           {renderCardContent()}
-          <button className="fullscreen-btn" onClick={openFullscreen}>
+          {!projectData.type.startsWith('RewardGiver') && (<button className="fullscreen-btn" onClick={openFullscreen}>
             🔍
-          </button>
+          </button>)}
         </div>
         <div className="PageCardInfo">
           <div className="PCI-type">{projectData.type}</div>
@@ -1173,7 +1348,32 @@ case 'Web': {
                   />
                 </div>
               )}
+              {projectData.type === 'RewardGiverIcon' && (
+                <div className="form-group">
+                  <label>Вставьте ссылку на иконку</label>
+                  <input
+                    type="text"
+                    name="content"
+                    value={editData.content}
+                    onChange={handleEditChange}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              )}
+              {projectData.type === 'RewardGiverTitle' && (
+                <div className="form-group">
+                  <label>Напишите титул</label>
+                  <input
+                    type="text"
+                    name="content"
+                    value={editData.content}
+                    onChange={handleEditChange}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              )}
 
+              {/*<UserCard key={user.id} user={user} />*/}
               <div className="form-group">
                 <label>Текущий контент:</label>
                 <div className="current-content">
@@ -1185,6 +1385,16 @@ case 'Web': {
                     <span>Видео по ссылке</span>
                   ) : projectData.type === 'Web' ? (
                     <span>{editData.content || 'Не указан'}</span>
+                  ) : projectData.type === 'RewardGiverIcon' ? (
+                    (() => {
+                    const ExampleUser = {id: -1, avatarUrl: null, name: "User", rankIcon: editData.content, rankTitle: null};
+                     return <UserCard key={ExampleUser.id} user={ExampleUser} />;
+                    })()
+                  ) : projectData.type === 'RewardGiverTitle' ? (
+                    (() => {
+                    const ExampleUser = {id: -1, avatarUrl: null, name: "User", rankIcon: null, rankTitle: editData.content};
+                     return <UserCard key={ExampleUser.id} user={ExampleUser} />;
+                    })()
                   ) : null}
                 </div>
               </div>

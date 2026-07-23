@@ -29,7 +29,7 @@ const Header = () => {
       <div className="h-left-menu">
         {user.logined && (<Link to="/settings"><img src={`${config.STATIC_LOCATION}/settings.png`} alt='settings' className="h-logo search-button-wrapper" /></Link>)}
         <SearchButton />
-        {user.logined && <NotificationButton />}
+        {/*user.logined && <NotificationButton />*/}
         <ProfileHeader />
       </div>
     </div>

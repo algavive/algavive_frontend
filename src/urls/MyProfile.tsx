@@ -105,6 +105,21 @@ export default function MyProfile() {
     }
   }
 
+  const removeIconsAndTitles = async() => {
+    if (confirm('Вы точно хотите сбросить у себя иконку и титул?')){
+    await fetch(`${config.BACKEND_URL}/api/change/reward/title`, {
+        method: 'POST',
+        body: JSON.stringify({projectId: "null"}),
+        credentials: 'include'
+      })
+    await fetch(`${config.BACKEND_URL}/api/change/reward/icon`, {
+        method: 'POST',
+        body: JSON.stringify({projectId: "null"}),
+        credentials: 'include'
+      })
+    }
+  }
+
   return (
     <>
       <div className="MyProfile">
@@ -217,6 +232,9 @@ export default function MyProfile() {
               />
             )}
           </div>
+          <button className="MPRS-button" style={{color:'white', background:'red', height:'24px'}} onClick={removeIconsAndTitles}>Снять титул и иконку</button>
+          <h1/>
+          <Link to={`/rewards?id=${user.id}`} className="MPRS-button" style={{width:'108px', height:'36px', color:'white'}} >Мои награды</Link> 
         </div>
       </div>
 

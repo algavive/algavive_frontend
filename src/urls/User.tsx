@@ -128,9 +128,10 @@ export default function User() {
               user.admin === 3 && 
                 (<h3 style={{color: 'blue'}}>Вице-Администратор Algavive</h3>) ||
               user.admin === 9 &&
-                (<h3 style={{color: 'blue'}}>Владелец Algavive</h3>)
+                (<h3 style={{color: 'blue'}}>Владелец Algavive</h3>)/*108x108*/
             }
           </div>
+          <Link to={`/rewards?id=${user.id}`} className="MPRS-button" style={{width:'216px', height:'32px', color:'white'}} >Награды пользователя</Link> 
         </div>
       </div>
 

@@ -19,6 +19,8 @@ import Search from './urls/Search'
 import MyProfile from './urls/MyProfile'
 import User from './urls/User'
 
+import Reward from './urls/Reward'
+
 export default function App() {
   return (
     <div>
@@ -37,6 +39,7 @@ export default function App() {
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/user" element={<User />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/rewards" element={<Reward />} />
       </Routes>
     </div>
   )

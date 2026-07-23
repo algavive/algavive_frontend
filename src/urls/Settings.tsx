@@ -19,6 +19,7 @@ export default function Settings(){
   const [adminIcon, setAdminIcon] = useState('')
   const [adminTitle, setAdminTitle] = useState('')
   const [adminBanDuration, setAdminBanDuration] = useState('')
+  const [adminProjectId, setAdminProjectId] = useState('')
   const [adminRole, setAdminRole] = useState('none')
   const [adminActionLoading, setAdminActionLoading] = useState(false)
   const [adminLogs, setAdminLogs] = useState<any[]>([])
@@ -146,152 +147,112 @@ export default function Settings(){
     }
   }, [])
 
-const handleAdminAction = async () => {
-  if (!adminUserId.trim()) {
-    setError('Введите ID пользователя')
-    return
-  }
-  const targetId = parseInt(adminUserId)
-  if (isNaN(targetId)) {
-    setError('Неверный ID')
-    return
-  }
+  const handleAdminAction = async () => {
+    if (!adminUserId.trim()) {
+      setError('Введите ID пользователя')
+      return
+    }
+    const targetId = parseInt(adminUserId)
+    if (isNaN(targetId)) {
+      setError('Неверный ID')
+      return
+    }
 
-  const turnstileToken = turnstileRef.current?.getResponse()
-  if (!turnstileToken) {
-    setError('Пожалуйста, подтвердите, что вы не робот')
-    turnstileRef.current?.reset()
-    return
-  }
+    const turnstileToken = turnstileRef.current?.getResponse()
+    if (!turnstileToken) {
+      setError('Пожалуйста, подтвердите, что вы не робот')
+      turnstileRef.current?.reset()
+      return
+    }
 
-  setAdminActionLoading(true)
-  setError('')
-  setSuccess('')
+    setAdminActionLoading(true)
+    setError('')
+    setSuccess('')
 
-  let action = ''
-  let value = ''
+    let action = ''
+    let value = ''
 
-  if (adminRole === 'moderator') {
-    action = 'set_role'
-    value = '1'
-  } else if (adminRole === 'admin') {
-    action = 'set_role'
-    value = '2'
-  } else if (adminRole === 'deputy-admin') {
-    action = 'set_role'
-    value = '3'
-  } else if (adminRole === 'remove') {
-    action = 'remove_role'
-    value = ''
-  } else if (adminIcon.trim()) {
-    action = 'set_icon'
-    value = adminIcon.trim()
-  } else if (adminTitle.trim()) {
-    action = 'set_title'
-    value = adminTitle.trim()
-  } else if (adminBanDuration) {
-    if (adminBanDuration === 'never') {
-      action = 'unban'
+    if (adminRole === 'add_rewardgiver' || adminRole === 'remove_rewardgiver') {
+      action = adminRole
+      value = adminProjectId.trim()
+      if (!value) {
+        setError('Введите ID проекта')
+        setAdminActionLoading(false)
+        return
+      }
+    } else if (adminRole === 'moderator') {
+      action = 'set_role'
+      value = '1'
+    } else if (adminRole === 'admin') {
+      action = 'set_role'
+      value = '2'
+    } else if (adminRole === 'deputy-admin') {
+      action = 'set_role'
+      value = '3'
+    } else if (adminRole === 'remove') {
+      action = 'remove_role'
       value = ''
-    } else {
-      action = 'ban'
-      value = adminBanDuration
-    } 
-  } else if (adminRole === 'reset_profile') {
+    } else if (adminRole === 'reset_profile') {
       action = 'reset_profile'
       value = ''
-    } 
-  else {
-    setError('Выберите действие или заполните поля')
-    setAdminActionLoading(false)
-    return
-  }
-
-  try {
-    const response = await fetch(`${config.BACKEND_URL}/api/admin/action`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        action,
-        targetUserId: targetId,
-        value,
-        turnstileToken
-      })
-    })
-    const data = await response.json()
-    if (response.ok) {
-      setSuccess('Действие выполнено')
-      setAdminUserId('')
-      setAdminIcon('')
-      setAdminTitle('')
-      setAdminBanDuration('')
-      setAdminRole('none')
-      turnstileRef.current?.reset()
-      fetchAdminLogs(logPage)
+    } else if (adminIcon.trim()) {
+      action = 'set_icon'
+      value = adminIcon.trim()
+    } else if (adminTitle.trim()) {
+      action = 'set_title'
+      value = adminTitle.trim()
+    } else if (adminBanDuration) {
+      if (adminBanDuration === 'never') {
+        action = 'unban'
+        value = ''
+      } else {
+        action = 'ban'
+        value = adminBanDuration
+      }
     } else {
-      setError(data.error || 'Ошибка выполнения действия')
-      turnstileRef.current?.reset()
+      setError('Выберите действие или заполните поля')
+      setAdminActionLoading(false)
+      return
     }
-  } catch (err) {
-    setError('Ошибка сети')
-  } finally {
-    setAdminActionLoading(false)
+
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/admin/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          action,
+          targetUserId: targetId,
+          value,
+          turnstileToken
+        })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setSuccess('Действие выполнено')
+        setAdminUserId('')
+        setAdminIcon('')
+        setAdminTitle('')
+        setAdminBanDuration('')
+        setAdminProjectId('')
+        setAdminRole('none')
+        turnstileRef.current?.reset()
+        fetchAdminLogs(logPage)
+      } else {
+        setError(data.error || 'Ошибка выполнения действия')
+        turnstileRef.current?.reset()
+      }
+    } catch (err) {
+      setError('Ошибка сети')
+    } finally {
+      setAdminActionLoading(false)
+    }
   }
-}
 
   const goToLogPage = (page: number) => {
     if (page < 1 || page > logTotalPages) return
     fetchAdminLogs(page)
   }
-const handleResetProfile = async () => {
-  if (!adminUserId.trim()) {
-    setError('Введите ID пользователя')
-    return
-  }
-  const targetId = parseInt(adminUserId)
-  if (isNaN(targetId)) {
-    setError('Неверный ID')
-    return
-  }
-  if (!confirm(`Сбросить профиль пользователя с ID ${targetId}? Это удалит аватар, описание и сбросит username.`)) {
-    return
-  }
-
-  setAdminActionLoading(true)
-  setError('')
-  setSuccess('')
-
-  try {
-    const response = await fetch(`${config.BACKEND_URL}/api/admin/action`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        action: 'reset_profile',
-        targetUserId: targetId,
-        value: ''
-      })
-    })
-    const data = await response.json()
-    if (response.ok) {
-      setSuccess('Профиль сброшен')
-      setAdminUserId('')
-      setAdminIcon('')
-      setAdminTitle('')
-      setAdminBanDuration('')
-      setAdminRole('none')
-      fetchAdminLogs(logPage)
-    } else {
-      setError(data.error || 'Ошибка')
-    }
-  } catch (err) {
-    setError('Ошибка сети')
-  } finally {
-    setAdminActionLoading(false)
-  }
-}
-
 
   return (
     <>
@@ -362,17 +323,33 @@ const handleResetProfile = async () => {
         <p>Длительность бана:</p>
         <input type="text" value={adminBanDuration} onChange={e => setAdminBanDuration(e.target.value)} placeholder="5h, 7d, always, never" />
         <h5>он по умолчанию, считает по дням(5h, это час), always-навсегда, never-разбанить</h5>
+
+        <h2>Ревард гиверы</h2>
+        <p>Айди проекта(с ревард гивером, чтобы передать по id пользователю):</p>
+        <input type="text" value={adminProjectId} onChange={e => setAdminProjectId(e.target.value)} placeholder="Введите ID проекта" />
+        <h1/>
         <label>
           <input
             type="radio"
             name="role"
-            value="reset_profile"
-            checked={adminRole === 'reset_profile'}
-            onChange={() => setAdminRole('reset_profile')}
-            style={{color: 'red'}}
+            value="add_rewardgiver"
+            checked={adminRole === 'add_rewardgiver'}
+            onChange={() => setAdminRole('add_rewardgiver')}
           />
-        <hbr style={{color: 'red', fontSize: '20px'}}>Сбросить профиль(ПРЕДУПРЕЖДАЮ, что это уберет с пользователя автарку, username и описание)</hbr>
+          Дать ревард гивер
+          </label>
+          <label>
+          <input
+            type="radio"
+            name="role"
+            value="remove_rewardgiver"
+            checked={adminRole === 'remove_rewardgiver'}
+            onChange={() => setAdminRole('remove_rewardgiver')}
+          />
+          Снять ревард гивер
         </label>
+
+        <h2>Остальное</h2>
         <p>Права администраторов:</p>
         <div>
           <label>
@@ -420,6 +397,19 @@ const handleResetProfile = async () => {
           </label>
           <h1/>
         </div>
+        <p>Сброс профиля:</p>
+        <label>
+          <input
+            type="radio"
+            name="role"
+            value="reset_profile"
+            checked={adminRole === 'reset_profile'}
+            onChange={() => setAdminRole('reset_profile')}
+            style={{color: 'red'}}
+          />
+        <hbr style={{color: 'red', fontSize: '20px'}}>Сбросить профиль(ПРЕДУПРЕЖДАЮ, что это уберет с пользователя автарку, username и описание)</hbr>
+        </label>
+        <h1/>
         <button onClick={handleAdminAction} disabled={adminActionLoading} style={{backgroundColor:'#efefef', width: '200px'}}><p style={{fontSize:'24px'}}>{adminActionLoading ? '...' : 'OK'}</p></button>
       </div>
     </div>
